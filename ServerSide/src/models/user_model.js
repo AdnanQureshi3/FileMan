@@ -2,11 +2,6 @@ import mongoose from "mongoose";
 import { type } from "os";
 
 const userSchema = mongoose.Schema({
-    id: {
-        type: String,
-        required: true,
-        unique: true
-    },
     username: {
         type: String,
         required: true,
@@ -23,7 +18,7 @@ const userSchema = mongoose.Schema({
     },
     fullname: {
         type: String,
-        required: true
+        default: "Anonymous User"
     },
     files: [{
         type: String,
