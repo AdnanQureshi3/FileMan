@@ -2,6 +2,7 @@ import { useState } from 'react'
 import Login from './components/Login'
 import Signup from './components/Signup'
 import Home from './components/Home'
+import FilePage from './components/FilePage.jsx'
 import MainLayout from './components/MainLayout.jsx'
 import { createBrowserRouter , RouterProvider } from 'react-router-dom'
 
@@ -13,6 +14,10 @@ const browserRouter = createBrowserRouter([
       {
         path:'/home',
         element:<Home />
+      }
+      ,{
+        path:'/filepage',
+        element:<FilePage />
       }
     ]
   }

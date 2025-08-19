@@ -1,20 +1,30 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
+const fileSchema = new Schema({
+  path: {
+    type: String,
+    required: true,
+  },
+  name: {
+    type: String,
+    required: true,
+  },
+  type: {
+    type: String,
+    required: true,
+  },
+  size: {
+    type: Number,
+    required: true,
+  },
+  downloadedContent: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
 
-const fileSchema = mongoose.Schema({
-    path:{
-        type:String,
-        required:true,
-    },
-    name:{
-        type:String,
-        required:true
-    },
-    type:{
-        type:String,
-        required:true
-    },
-    isPasswordProtected: {
+  // ✅ Optional Password Protection
+  isPasswordProtected: {
     type: Boolean,
     default: false,
   },
@@ -22,6 +32,8 @@ const fileSchema = mongoose.Schema({
     type: String, // store hashed password using bcrypt
     default: null,
   },
+
+  // ✅ Optional Expiry
   hasExpiry: {
     type: Boolean,
     default: false,
@@ -30,14 +42,25 @@ const fileSchema = mongoose.Schema({
     type: Date,
     default: null,
   },
-    createdBy: {
+
+  // ✅ Status (active/inactive)
+  status: {
+    type: String,
+    enum: ['active', 'expired'],
+    default: 'active',
+  },
+  shortUrl: {
+    type: String,
+    default: null,
+  },
+  // ✅ User ID
+  createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
 
+}, { timestamps: true });
 
-} , {timestamps:true});
-
-const Files = mongoose.model("Files" , fileSchema);
-export default Files
+const File = mongoose.model("File", fileSchema);
+export default File;
