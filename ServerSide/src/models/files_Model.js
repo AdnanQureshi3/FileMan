@@ -1,7 +1,5 @@
-import { Timestamp } from "bson";
-import { profile } from "console";
 import mongoose from "mongoose";
-import { type } from "os";
+
 
 const fileSchema = mongoose.Schema({
     path:{
@@ -39,4 +37,7 @@ const fileSchema = mongoose.Schema({
   },
 
 
-} , {timestamps:true})
+} , {timestamps:true});
+
+const Files = mongoose.model("Files" , fileSchema);
+export default Files
