@@ -4,9 +4,9 @@ import isAuthanticated from "../middlewares/Auth.js";
 const router = express.Router();
 
 
-router.get('/test', (req, res) => {
-  res.send('Backend working fine');
-});
+// router.get('/test', (req, res) => {
+//   res.send('Backend working fine');
+// });
 
 router.route('/register').post(register)
 router.post('/login' , login);
