@@ -7,6 +7,8 @@ dotenv.config();
 
 export const register = async(req , res)=>{
     console.log("Registering user...");
+    console.log(req.body);
+    if (req.body._id) delete req.body._id;
     try {
         const { username, email, password } = req.body;
         if (!username || !email || !password) {
@@ -30,26 +32,34 @@ export const register = async(req , res)=>{
             });
         }
         const hashedpassword = await bcrypt.hash(password, 10);
-        user = await User.create({
-            username,
-            email,
-            password: hashedpassword
-        });
+       user = await User.create({
+   username,
+   email,
+   password: hashedpassword
+});
+console.log("New User Created:", user._id);
+
 
         return res.status(201).json({
             message: "Account created Successfully.",
             success: true,
-            user
+            
         })
     }
     catch (error) {
-        console.log(error);
+        if (error.code === 11000) {
+    // Duplicate key error
+    const field = Object.keys(error.keyPattern)[0];
+    return res.status(400).json({ message: `${field} already exists` });
+  }
+  res.status(500).json({ message: "Something went wrong" });
     }
 
 }
 export const login = async(req , res) =>{
-    console.log("Logging in user..." , process.env.JWT_SECRET);
+    console.log("Logging in user..." , req.body);
     try{
+       
         const { email, password } = req.body;
         if (!email || !password) {
             return res.status(401).json({

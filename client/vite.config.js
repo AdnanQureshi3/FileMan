@@ -4,4 +4,10 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  server: {
+    hmr: {
+      overlay: false, // removes red error popup overlay
+    },
+  },
+  logLevel: 'silent',   // hides [vite] hot updated logs in console
 })
