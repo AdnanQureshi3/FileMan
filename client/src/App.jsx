@@ -3,13 +3,13 @@ import Login from './components/Login'
 import Signup from './components/Signup'
 import Home from './components/Home'
 import FilePage from './components/FilePage.jsx'
-import MainLayout from './components/MainLayout.jsx'
+import UserDashBoard from './components/UserDashBoard'
 import { createBrowserRouter , RouterProvider } from 'react-router-dom'
 
 const browserRouter = createBrowserRouter([
   {
     path:'/',
-    element:<MainLayout />,
+    element:<UserDashBoard />,
     children:[
       {
         path:'/home',
