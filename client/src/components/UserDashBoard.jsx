@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Header from "./Header";
 import Sidebar from "./SideBar";
-// import StatsGrid from "./StatesGrid";
+import StatsGrid from "./StatGrids";
 import ProfilePage from "./ProfilePage";
 import Home from "./Home";
 import MyFilePage from "./MyFilePage";
@@ -47,8 +47,8 @@ const UserDashBoard = () => {
           {activeTab === "home" && 
 
            <>
-          <Home />
-          {/* <StatsGrid /> */}
+          {/* <Home /> */}
+          <StatsGrid />
           {/* <FileShow /> */}
          </>
            }

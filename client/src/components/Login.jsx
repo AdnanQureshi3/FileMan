@@ -4,6 +4,8 @@ import { toast } from 'react-toastify';
 import Img from '../assets/public/themeImg.png'
 import axios from 'axios'
 import { useNavigate  } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setAuthUser } from "../Redux/Slice/auth.js"
 
 function Login() {
     const [loading, setloading] = useState(false);
@@ -12,6 +14,7 @@ function Login() {
         password: ""
     });
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     
 
     const ChangeEventHandler = (e) => {
@@ -28,7 +31,8 @@ function Login() {
                 withCredentials: true
             });
             if(res.data.success) {
-                
+              console.log(res.data);
+                dispatch(setAuthUser(res.data.user));
                 navigate("/home");
            
                 toast.success("Login successful ");

@@ -1,5 +1,5 @@
-import File from "../models/file_Model.js";
-import s3 from "../config/s3.js";
+import File from '../models/files_Model.js';
+import s3 from "../middlewares/s3.js";
 import bcrypt from "bcryptjs";
 import AWS from "aws-sdk";
 import nodemailer from "nodemailer";

@@ -82,10 +82,13 @@ export const login = async(req , res) =>{
             });
         }
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+        const { password: _, ...safeUser } = user._doc;
+
+        
         return res.status(200).json({
             message: "Login successful.",
             success: true,
-            token
+            user: safeUser
         });
     }
     catch (error) {
