@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import "./FileUploader.css";
 import { useDispatch, useSelector } from "react-redux";
-// import { uploadFile } from "../../../redux/slice/file/fileThunk";
+// import { uploadFile } from '../Redux/Slice/file/fileThunk.js'
 import { toast } from "react-toastify";
 
 const FileUploader = () => {
@@ -15,14 +15,21 @@ const FileUploader = () => {
   const [password, setPassword] = useState("");
   const [enableExpiry, setEnableExpiry] = useState(false);
   const [expiryDate, setExpiryDate] = useState("");
+  const [disable , setDisable] = useState(false);
+
+  const limit = 10 * 2024 * 1024;
 
   const handleBrowseClick = () => {
     fileInputRef.current.click();
   };
 
   const handleFiles = (fileList) => {
-    const newFiles = Array.from(fileList).filter(
-      (file) => file.size <= 10 * 1024 * 1024
+    const newFiles = Array.from(fileList).map(
+      (file) => {
+        if(file.size >= limit){
+            setDisable(true);
+        }
+      }
     );
     setFiles((prev) => [...prev, ...newFiles]);
     toast.success("File(s) added!");
@@ -79,7 +86,7 @@ const FileUploader = () => {
     }
 
     try {
-    //   await dispatch(uploadFile(formData)).unwrap();
+      await dispatch(uploadFile(formData)).unwrap();
       toast.success("Files uploaded successfully!");
       setFiles([]);
       window.location.reload();
@@ -263,6 +270,8 @@ const FileUploader = () => {
         <button
           className="upload-btn"
           onClick={handleUpload}
+          disabled={disable || files.length === 0}
+
         //   disabled={loading || files.length === 0}
         >
           {1===3 ? "Uploading..." : "Upload"}

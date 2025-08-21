@@ -35,6 +35,32 @@ const userSchema = mongoose.Schema({
         type:Number,
         default:0
     },
+    isPremium:{
+        type:Boolean,
+        default:false
+    },
+    premiumExpiry:{
+        type:Date
+    },
+    isVerified:{
+        type:Boolean,
+        default:false
+    },
+    opt:{
+        type:Number
+    },
+    optExpiry:{
+        type:Date
+    },
+    filesizeLimit:{
+        type:Number,
+        default:10
+    },
+    TotalSizeLimit:{
+        type:Number,
+        default:25
+    },
+    
     documentCount: { type: Number, default: 0 },
 }, {timestamps:true})
 
