@@ -60,7 +60,11 @@ const userSchema = mongoose.Schema({
         type:Number,
         default:25
     },
-    
+    memoryLeft:{
+        type:Number,
+        default:25
+    },
+
     documentCount: { type: Number, default: 0 },
 }, {timestamps:true})
 

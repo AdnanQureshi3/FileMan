@@ -3,8 +3,9 @@ import "./FileUploader.css";
 import { useDispatch, useSelector } from "react-redux";
 // import { uploadFile } from '../Redux/Slice/file/fileThunk.js'
 import { toast } from "react-toastify";
+// import { set } from "mongoose";
 
-const FileUploader = () => {
+const FileUploader = ({setActiveTab}) => {
   const fileInputRef = useRef(null);
   const dispatch = useDispatch();
 //   const { loading } = useSelector((state) => state.file);
@@ -16,24 +17,36 @@ const FileUploader = () => {
   const [enableExpiry, setEnableExpiry] = useState(false);
   const [expiryDate, setExpiryDate] = useState("");
   const [disable , setDisable] = useState(false);
-
-
-  // const limit = user.;
+  const limit = user.filesizeLimit;
+  const memoryLeft = user?.memoryLeft || 25;
+  let countFileGreaterThanLimit = 0;
 
   const handleBrowseClick = () => {
     fileInputRef.current.click();
   };
 
   const handleFiles = (fileList) => {
-    const newFiles = Array.from(fileList).map(
-      (file) => {
-        if(file.size >= limit){
-            setDisable(true);
-        }
+    let tempUsedMemory = files.reduce((acc, f) => acc + f.size, 0); // used memory
+    let newFiles = [];
+
+    Array.from(fileList).forEach((file) => {
+      if (file.size > limit * 1024 * 1024) {
+        setDisable(true);
+        countFileGreaterThanLimit++;
+        toast.error(`${file.name} exceeds file size limit of ${limit}MB`);
+      } else if (tempUsedMemory + file.size > memoryLeft * 1024 * 1024) {
+        setDisable(true);
+        toast.error(`${file.name} exceeds your remaining memory of ${memoryLeft}MB`);
+      } else {
+        newFiles.push(file);
+        tempUsedMemory += file.size;
       }
-    );
-    setFiles((prev) => [...prev, ...newFiles]);
-    toast.success("File(s) added!");
+    });
+
+    if (newFiles.length > 0) {
+      setFiles((prev) => [...prev, ...newFiles]);
+      toast.success("File(s) added!");
+    }
   };
 
   const handleFileInputChange = (e) => {
@@ -57,7 +70,21 @@ const FileUploader = () => {
   };
 
   const removeFile = (index) => {
+    const removedFile = files[index];
     setFiles((prev) => prev.filter((_, i) => i !== index));
+
+    if (removedFile.size > limit * 1024 * 1024) {
+      countFileGreaterThanLimit--;
+    }
+
+    // recalc memory usage
+    const totalUsedMemory = files
+      .filter((_, i) => i !== index)
+      .reduce((acc, f) => acc + f.size, 0);
+    if (totalUsedMemory <= memoryLeft * 1024 * 1024 && countFileGreaterThanLimit === 0) {
+      setDisable(false);
+    }
+
     toast.info("File removed");
   };
 
@@ -113,8 +140,23 @@ const FileUploader = () => {
         <div className="dropbox-icon">📁</div>
         <div className="dropbox-text">Drop files here</div>
         <div className="dropbox-subtext">
-          Supported formats: JPG, PNG, PDF, MP4, MOV, AVI, MKV (Max 10MB)
+          Supported formats: JPG, PNG, PDF, MP4, MOV, AVI, MKV (Max {limit}MB)
         </div>
+        {disable && (
+          <div className="flex justify-between items-center bg-red-100 text-red-700 px-4 py-2 rounded-md mt-2 text-sm font-medium">
+            <p>⚠️ File size or memory limit exceeded</p>
+            <button
+              className="bg-blue-600 hover:bg-blue-700 z-50  text-white px-3 py-1 rounded-md text-xs font-semibold transition-transform transform hover:scale-105"
+               onClick={(e) => {
+    e.stopPropagation(); // ⬅ stops the browse click
+    setActiveTab("plans");
+  }}
+            >
+              Upgrade to Premium
+            </button>
+          </div>
+        )}
+
         <button
           className="browse-btn"
           onClick={(e) => {

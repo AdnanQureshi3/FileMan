@@ -40,12 +40,12 @@ const UserDashBoard = () => {
         {/* sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} */}
         <Header  />
         <main className="flex-1 p-6 mt-20">
-          {activeTab === "upload" && <UploadPage />}
+          {activeTab === "upload" && <UploadPage setActiveTab={setActiveTab}  />}
           {activeTab === "profile" && <ProfilePage />}
           {activeTab === "settings" && <ProfilePage />}
           {activeTab === "files" && <MyFilePage />}
-          {activeTab === "logout" && <UploadPage />}
           {activeTab === "plans" && <PurchasePage />}
+          {activeTab === "logout" && <PurchasePage />}
           {activeTab === "home" && 
 
            <>

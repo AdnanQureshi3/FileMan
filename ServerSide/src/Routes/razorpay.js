@@ -39,7 +39,7 @@ router.post("/verify-payment", async (req, res) => {
 
     purchasePremium({ paymentDetails });
     const user = await User.findById(paymentDetails.userId).select("-password");
-    console.log(user);
+    
     res.json({ success: true, message: "Payment verified, premium activated", user });
   } else {
     res.status(400).json({ success: false, message: "Invalid signature" });
