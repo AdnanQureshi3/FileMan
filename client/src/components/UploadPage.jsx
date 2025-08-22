@@ -17,7 +17,8 @@ const FileUploader = () => {
   const [expiryDate, setExpiryDate] = useState("");
   const [disable , setDisable] = useState(false);
 
-  const limit = 10 * 2024 * 1024;
+
+  // const limit = user.;
 
   const handleBrowseClick = () => {
     fileInputRef.current.click();

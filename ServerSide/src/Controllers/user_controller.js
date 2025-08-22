@@ -82,6 +82,13 @@ export const login = async(req , res) =>{
             });
         }
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+        if(user.isPremium == true && user.premiumExpiry < Date.now()){
+            user.isPremium = false;
+            user.filesizeLimit = 10;
+            user.TotalSizeLimit = 25;
+
+            await user.save();
+        }
         const { password: _, ...safeUser } = user._doc;
 
         
