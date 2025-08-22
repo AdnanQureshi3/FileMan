@@ -1,5 +1,5 @@
 import express from "express";
-import {register , login , deleteUser, purchasePremium} from '../Controllers/user_controller.js'
+import {register , login , deleteUser} from '../Controllers/user_controller.js'
 import isAuthanticated from "../middlewares/Auth.js";
 const router = express.Router();
 
@@ -11,6 +11,6 @@ const router = express.Router();
 router.route('/register').post(register)
 router.post('/login' , login);
 router.delete('/delete', isAuthanticated, deleteUser);
-router.put('/upgradeToPremium/:id'  , purchasePremium );
+// router.put('/upgradeToPremium/:id'  , purchasePremium );
 
 export default router;

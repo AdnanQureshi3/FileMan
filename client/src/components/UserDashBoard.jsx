@@ -8,6 +8,7 @@ import MyFilePage from "./MyFilePage";
 import UploadPage from "./UploadPage";
 // import FileShow from "./FileShow";
 // import Logout from "./Logout";
+import PurchasePage from "./PurchasePage";
 import Footer from "./Footer";
 
 const UserDashBoard = () => {
@@ -44,6 +45,7 @@ const UserDashBoard = () => {
           {activeTab === "settings" && <ProfilePage />}
           {activeTab === "files" && <MyFilePage />}
           {activeTab === "logout" && <UploadPage />}
+          {activeTab === "plans" && <PurchasePage />}
           {activeTab === "home" && 
 
            <>

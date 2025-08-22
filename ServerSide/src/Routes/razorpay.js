@@ -2,14 +2,17 @@ import express from "express";
 import crypto from "crypto";
 import razorpay from '../config/razorpay.js'
 import User from "../models/user_Model.js";
+import { purchasePremium } from "../Controllers/user_controller.js";
 
 
 const router = express.Router();
 
 // Create order
 router.post("/create-order", async (req, res) => {
+    console.log("yeah aorder created")
   try {
     const options = {
+
       amount: req.body.amount * 100, // in paise
       currency: "INR",
       receipt: "receipt_" + Date.now(),
@@ -23,7 +26,8 @@ router.post("/create-order", async (req, res) => {
 
 // Verify payment
 router.post("/verify-payment", async (req, res) => {
-  const { razorpay_order_id, razorpay_payment_id, razorpay_signature, userId } = req.body;
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature, paymentDetails } = req.body;
+  console.log("Verifying payment...", paymentDetails);
 
   const sign = razorpay_order_id + "|" + razorpay_payment_id;
   const expectedSign = crypto
@@ -32,9 +36,11 @@ router.post("/verify-payment", async (req, res) => {
     .digest("hex");
 
   if (razorpay_signature === expectedSign) {
-    
-    await User.findByIdAndUpdate(userId, { isPremium: true });
-    res.json({ success: true, message: "Payment verified, premium activated" });
+
+    purchasePremium({ paymentDetails });
+    const user = await User.findById(paymentDetails.userId).select("-password");
+    console.log(user);
+    res.json({ success: true, message: "Payment verified, premium activated", user });
   } else {
     res.status(400).json({ success: false, message: "Invalid signature" });
   }

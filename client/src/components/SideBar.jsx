@@ -11,6 +11,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, setActiveTab, activeTab }) => {
     { name: "Upload Files", icon: "📤", id: "upload" },
     { name: "Settings", icon: "⚙️", id: "settings" },
     { name: "Logout", icon: "🚪", id: "logout" },
+    { name: "Plans", icon: "�", id: "plans" },
   ];
 
   return (

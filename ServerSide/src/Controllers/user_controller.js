@@ -141,46 +141,37 @@ export const deleteUser = async(req , res)=>{
     }
 
 }
+export const purchasePremium = async ({ paymentDetails }) => {
+    console.log("Processing premium purchase...", paymentDetails);
+  const userId = paymentDetails.user;
+  if (!userId) {
+    return { success: false, message: "User not authenticated." };
+  }
 
-export const purchasePremium = async (req, res) => {
-    const userId = req.params.id;
-    if (!userId) {
-        return res.status(401).json({
-            msg: "User not authenticated.",
-            success: false,
-        });
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return { success: false, message: "User not found." };
     }
-    try {
-        
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({
-                msg: "User not found.",
-                success: false,
-            });
-        }
-        const {paymentDetails} = req.body;
-        // if (user.isPremium) {
-        //     return res.status(400).json({
-        //         msg: "User is already a premium member.",
-        //         success: false,
-        //     });
-        // }
-        user.isPremium = true;
-        user.filesizeLimit = paymentDetails.filesizeLimit;
-        user.TotalSizeLimit = paymentDetails.totalSizeLimit;
-        user.premiumExpiry = new Date(Date.now() + paymentDetails.days * 24 * 60 * 60 * 1000); 
-        await user.save();
-        return res.status(200).json({
-            msg: "Premium membership purchased successfully.",
-            success: true,
-            user
-        });
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({
-            msg: "Something went wrong.",
-            success: false,
-        });
-    }
-}
+
+    // if (user.isPremium) {
+    //   return { success: false, message: "User is already a premium member." };
+    // }
+
+    // Update user premium details
+    user.isPremium = true;
+    user.filesizeLimit = paymentDetails.filesizeLimit;
+    user.TotalSizeLimit = paymentDetails.totalSizeLimit;
+    user.premiumExpiry = new Date(
+      Date.now() + paymentDetails.days * 24 * 60 * 60 * 1000
+    );
+    user.isVerified = true;
+
+    await user.save();
+
+    return { success: true, message: "Premium membership purchased successfully." };
+  } catch (error) {
+    console.log(error);
+    return { success: false, message: "Something went wrong." };
+  }
+};

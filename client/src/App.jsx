@@ -4,6 +4,7 @@ import Signup from './components/Signup'
 import Home from './components/Home'
 import FilePage from './components/FilePage.jsx'
 import UserDashBoard from './components/UserDashBoard'
+import PurchasePage from './components/PurchasePage.jsx'
 import { createBrowserRouter , RouterProvider } from 'react-router-dom'
 
 const browserRouter = createBrowserRouter([
@@ -18,7 +19,12 @@ const browserRouter = createBrowserRouter([
       ,{
         path:'/filepage',
         element:<FilePage />
+      },
+      {
+        path:'/plans',
+        element:<PurchasePage />
       }
+      
     ]
   }
   ,{
@@ -28,7 +34,8 @@ const browserRouter = createBrowserRouter([
   {
     path:'signup',
     element:<Signup />
-  }
+  },
+  
 ])
 
 import './App.css'
