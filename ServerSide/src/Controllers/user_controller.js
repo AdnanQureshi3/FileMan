@@ -165,7 +165,7 @@ export const purchasePremium = async ({ paymentDetails }) => {
     user.premiumExpiry = new Date(
       Date.now() + paymentDetails.days * 24 * 60 * 60 * 1000
     );
-    user.isVerified = true;
+    user.isVerified = false;
 
     await user.save();
 

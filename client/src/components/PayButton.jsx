@@ -14,16 +14,17 @@ function PayButton({ plan }) {
                 "http://localhost:3000/api/razorpay/create-order",
                 { amount: plan.price }
             );
+            
 
             const paymentDetails = {
                 plan: plan.name,
+                userId: userId,
                 filesizeLimit: plan.filesizeLimit,
                 totalSizeLimit: plan.totalSizeLimit,
                 amount: plan.price,
                 days: plan.days,
-                user: userId,
             };
-
+            console.log("Initiating payment with details:", paymentDetails);
             const options = {
                 key: import.meta.env.VITE_RAZORPAY_KEY_ID,
                 amount: data.amount,
@@ -37,6 +38,7 @@ function PayButton({ plan }) {
                             ...response,
                             paymentDetails
                         });
+                        console.log(res.data.user);
                         dispatch(setAuthUser(res.data.user));
                         alert("✅ Payment successful! Premium activated (Test Mode)");
                     } catch (err) {

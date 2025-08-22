@@ -47,9 +47,9 @@ function Footer({setActiveTab}) {
 
       {/* Mobile Bottom Nav */}
       <div className="sm:hidden fixed bottom-0 left-0 w-full bg-[var(--bg-color)] text-[var(--text-color)] shadow-t z-50 flex justify-around items-center py-2">
-        <Link to="/" className="flex flex-col items-center cursor-pointer">
+        <div onClick={() => ActiveTabHandler("home")} className="flex flex-col items-center cursor-pointer">
           🏠 <span className="text-xs">Home</span>
-        </Link>
+        </div>
         <div onClick={() => ActiveTabHandler("files")} className="flex flex-col items-center">
           📂 <span className="text-xs">My Files</span>
         </div>
@@ -59,8 +59,8 @@ function Footer({setActiveTab}) {
         >
           ＋
         </div>
-        <div  onClick={() => ActiveTabHandler("profile")} className="flex flex-col cursor-pointer items-center">
-          👤 <span className="text-xs">Profile</span>
+        <div  onClick={() => ActiveTabHandler("plans")} className="flex flex-col cursor-pointer items-center">
+          💎 <span className="text-xs">Plans</span>
         </div>
         <button onClick={toggleMode} className="flex flex-col items-center">
           {mode === "light" ? "🌞" : "🌙"} <span className="text-xs">Mode</span>
