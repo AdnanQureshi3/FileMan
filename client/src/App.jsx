@@ -6,6 +6,8 @@ import FilePage from './components/FilePage.jsx'
 import UserDashBoard from './components/UserDashBoard'
 import PurchasePage from './components/PurchasePage.jsx'
 import { createBrowserRouter , RouterProvider } from 'react-router-dom'
+import './App.css'
+import DownloadPage from './components/DownloadPage.jsx'
 
 const browserRouter = createBrowserRouter([
   {
@@ -35,10 +37,13 @@ const browserRouter = createBrowserRouter([
     path:'signup',
     element:<Signup />
   },
-  
+   {
+     path:'/f/:shortCode',
+     element:<DownloadPage />
+   }
+
 ])
 
-import './App.css'
 
 function App() {
 
