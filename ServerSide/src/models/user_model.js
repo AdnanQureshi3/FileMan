@@ -46,10 +46,10 @@ const userSchema = mongoose.Schema({
         type:Boolean,
         default:false
     },
-    opt:{
+    otp:{
         type:Number
     },
-    optExpiry:{
+    otpExpiry:{
         type:Date
     },
     filesizeLimit:{

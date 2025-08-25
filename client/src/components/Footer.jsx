@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+
 
 function Footer({setActiveTab}) {
   const [mode, setMode] = React.useState("light");
@@ -17,14 +17,13 @@ function Footer({setActiveTab}) {
 
   return (
     <>
-      {/* Desktop / Tablet Footer */}
+   
       <footer className="hidden sm:flex w-full py-6 px-4 backdrop-blur-lg bg-white/40 dark:bg-black/30 text-[var(--text-color)] shadow-inner flex-col md:flex-row items-center justify-between">
-        {/* Left: Credit */}
+
         <p className="text-sm font-medium text-center md:text-left">
           Crafted with ❤️ by <span className="font-semibold">Adnan Qureshi</span>
         </p>
 
-        {/* Right: Socials */}
         <div className="flex items-center gap-5 mt-4 md:mt-0">
           {socialIcons.map((icon, i) => (
             <a

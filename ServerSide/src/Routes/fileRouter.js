@@ -7,7 +7,6 @@ const router=Router();
 
 router.post("/upload", upload.array('files'), uploadFiles);
 
-
 router.get("/download/:fileId",downloadFile);
 router.delete("/delete/:fileId",deleteFile);
 router.put("/update/:fileId",updateFileStatus);

@@ -27,7 +27,7 @@ router.post("/create-order", async (req, res) => {
 // Verify payment
 router.post("/verify-payment", async (req, res) => {
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature, paymentDetails } = req.body;
-  console.log("Verifying payment...", paymentDetails);
+//   console.log("Verifying payment...", paymentDetails);
 
   const sign = razorpay_order_id + "|" + razorpay_payment_id;
   const expectedSign = crypto

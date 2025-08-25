@@ -1,6 +1,7 @@
 import File from '../models/files_Model.js';
-import s3 from "../config/s3.js";
+// import s3 from "../config/s3.js";
 import bcrypt from "bcryptjs";
+import dotenv from "dotenv";  
 import AWS from "aws-sdk";
 import nodemailer from "nodemailer";
 import shortid from "shortid";
@@ -9,10 +10,12 @@ import User from "../models/user_Model.js";
 import path from "path";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+dotenv.config();
 
 
 
 const uploadFiles = async (req, res) => {
+  // console.log("uploading... in backend" , req.files);
   if (!req.files || req.files.length === 0) {
     return res.status(400).json({ error: 'No files uploaded' });
   }
@@ -25,7 +28,8 @@ const uploadFiles = async (req, res) => {
       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
       region: process.env.AWS_REGION,
     });
-
+    // console.log(process.env.AWS_ACCESS_KEY_ID, process.env.AWS_SECRET_ACCESS_KEY, process.env.AWS_REGION);
+    
     const savedFiles = [];
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ error: 'User not found' });

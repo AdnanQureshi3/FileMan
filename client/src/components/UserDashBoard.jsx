@@ -6,7 +6,7 @@ import ProfilePage from "./ProfilePage";
 import Home from "./Home";
 import MyFilePage from "./MyFilePage";
 import UploadPage from "./UploadPage";
-// import FileShow from "./FileShow";
+import FileShow from "./FileShow";
 // import Logout from "./Logout";
 import PurchasePage from "./PurchasePage";
 import Footer from "./Footer";
@@ -51,7 +51,7 @@ const UserDashBoard = () => {
            <>
           {/* <Home /> */}
           <StatsGrid />
-          {/* <FileShow /> */}
+          <FileShow />
          </>
            }
            

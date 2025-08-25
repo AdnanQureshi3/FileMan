@@ -1,2 +1,3 @@
+client/.env
+ServerSide/.env
 node_modules/
-.env/

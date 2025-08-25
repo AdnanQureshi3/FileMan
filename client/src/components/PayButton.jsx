@@ -25,6 +25,7 @@ function PayButton({ plan }) {
                 days: plan.days,
             };
             console.log("Initiating payment with details:", paymentDetails);
+            
             const options = {
                 key: import.meta.env.VITE_RAZORPAY_KEY_ID,
                 amount: data.amount,

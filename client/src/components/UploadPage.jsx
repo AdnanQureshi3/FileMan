@@ -1,14 +1,14 @@
 import React, { useRef, useState } from "react";
 import "./FileUploader.css";
 import { useDispatch, useSelector } from "react-redux";
-// import { uploadFile } from '../Redux/Slice/file/fileThunk.js'
+import { uploadFile } from '../Redux/Slice/file/fileThunk.js'
 import { toast } from "react-toastify";
 // import { set } from "mongoose";
 
 const FileUploader = ({setActiveTab}) => {
   const fileInputRef = useRef(null);
   const dispatch = useDispatch();
-//   const { loading } = useSelector((state) => state.file);
+  // const { loading } = useSelector((state) => state.file);
   const { user } = useSelector((state) => state.auth);
 
   const [files, setFiles] = useState([]);
@@ -30,6 +30,7 @@ const FileUploader = ({setActiveTab}) => {
     let newFiles = [];
 
     Array.from(fileList).forEach((file) => {
+
       if (file.size > limit * 1024 * 1024) {
         setDisable(true);
         countFileGreaterThanLimit++;
@@ -72,7 +73,6 @@ const FileUploader = ({setActiveTab}) => {
   const removeFile = (index) => {
     const removedFile = files[index];
     setFiles((prev) => prev.filter((_, i) => i !== index));
-
     if (removedFile.size > limit * 1024 * 1024) {
       countFileGreaterThanLimit--;
     }
@@ -113,8 +113,12 @@ const FileUploader = ({setActiveTab}) => {
       formData.append("password", password);
     }
 
+
+
     try {
+
       await dispatch(uploadFile(formData)).unwrap();
+      console.log("Uploaded");
       toast.success("Files uploaded successfully!");
       setFiles([]);
       window.location.reload();
