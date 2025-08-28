@@ -1,9 +1,8 @@
 import express from "express";
 import crypto from "crypto";
-import razorpay from '../config/razorpay.js'
+import razorpay from '../config/razorpay.js';
 import User from "../models/user_Model.js";
 import { purchasePremium } from "../Controllers/user_controller.js";
-
 
 const router = express.Router();
 
