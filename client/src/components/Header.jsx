@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import logo from "../assets/logo.png";
+
 
 function Header() {
   const [mode, setModeState] = useState("light");
@@ -40,7 +40,7 @@ function Header() {
       {/* DESKTOP HEADER */}
       <header className="hidden sm:flex fixed top-0 left-0 w-full px-6 py-3 bg-[var(--bg-color)] shadow-md z-50 items-center justify-between">
         <Link to="/" className="flex items-center space-x-2">
-          <img src={logo} alt="Logo" className="w-10 h-10 rounded-full" />
+          <img src='/logo.png' alt="Logo" className="w-10 h-10 rounded-full" />
           <span className="text-2xl font-bold text-[var(--primary-text)]">FileMan</span>
         </Link>
 
@@ -77,7 +77,7 @@ function Header() {
    {/* MOBILE HEADER */}
 <header className="sm:hidden fixed top-0 left-0 w-full px-4 py-3 bg-[var(--bg-color)] shadow-md z-50 flex flex-row justify-between">
   <Link to="/" className="flex flex-col items-center">
-    <img src={logo} alt="Logo" className="w-12 h-12 rounded-full" />
+    <img src='/logo.png' alt="Logo" className="w-12 h-12 rounded-full" />
     <span className="font-bold text-lg text-[var(--primary-text)] mt-1">FileMan</span>
   </Link>
 

@@ -1,6 +1,8 @@
 import React from "react";
 import { FileText, Database, Calendar, Clock } from "lucide-react";
 import PayButton from "./PayButton";
+import { useSearchParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const plans = [
   {
@@ -30,6 +32,8 @@ const plans = [
 ];
 
 function PurchasePage() {
+ 
+  const { user } = useSelector((state) => state.auth);
   return (
     <div className="p-4 flex flex-col gap-4">
       <h1 className="text-2xl font-bold mb-2">Choose Your Plan</h1>
@@ -64,7 +68,7 @@ function PurchasePage() {
               </button>
             ) : (
               <div className="mt-auto">
-                <PayButton plan={plan} />
+                <PayButton disabled={user?.isPremium || user === null}  plan={plan} />
               </div>
             )}
           </div>

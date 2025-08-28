@@ -316,9 +316,9 @@ const FileUploader = ({setActiveTab}) => {
         </div>
       )}
 
-    <div className="upload-action flex items-center justify-between gap-4">
+    <div className="upload-action flex items-center  justify-between gap-4">
   {user === null && (
-    <div onClick={() => { navigate("/login") }} className="bg-yellow-50 border border-yellow-300 text-yellow-800 px-4 py-2 rounded-lg text-sm font-medium shadow-sm">
+    <div onClick={() => { navigate("/login") }} className="bg-yellow-50 border cursor-pointer hover:underline border-yellow-300 text-yellow-800 px-4 py-2 rounded-lg text-sm font-medium shadow-sm">
       Please log in to upload files
     </div>
   )}
