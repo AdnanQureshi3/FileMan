@@ -1,6 +1,5 @@
 import { CloudUpload } from 'lucide-react'
 import React, { useState } from 'react'
-import Img from '../assets/public/themeImg.png'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import axios from 'axios'
@@ -98,7 +97,7 @@ function Signup() {
         {/* Right: Illustration */}
         <div className="hidden md:flex w-[65%] bg-purple-50 items-center justify-center p-6">
           <img
-            src={Img}
+            src='/themeImg.png'
             alt="File Sharing Illustration"
             className="w-full drop-shadow-xl"
           />

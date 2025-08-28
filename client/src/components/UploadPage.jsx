@@ -3,12 +3,15 @@ import "./FileUploader.css";
 import { useDispatch, useSelector } from "react-redux";
 import { uploadFile } from '../Redux/Slice/file/fileThunk.js'
 import { toast } from "react-toastify";
-// import { set } from "mongoose";
+import { useNavigate } from "react-router-dom";
+
+
 
 const FileUploader = ({setActiveTab}) => {
+  const navigate = useNavigate();
   const fileInputRef = useRef(null);
   const dispatch = useDispatch();
-  // const { loading } = useSelector((state) => state.file);
+  const { loading } = useSelector((state) => state.file);
   const { user } = useSelector((state) => state.auth);
 
   const [files, setFiles] = useState([]);
@@ -17,7 +20,7 @@ const FileUploader = ({setActiveTab}) => {
   const [enableExpiry, setEnableExpiry] = useState(false);
   const [expiryDate, setExpiryDate] = useState("");
   const [disable , setDisable] = useState(false);
-  const limit = user.filesizeLimit;
+  const limit = user?.filesizeLimit || 10;
   const memoryLeft = user?.memoryLeft || 25;
   let countFileGreaterThanLimit = 0;
 
@@ -313,17 +316,22 @@ const FileUploader = ({setActiveTab}) => {
         </div>
       )}
 
-      <div className="upload-action">
-        <button
-          className="upload-btn"
-          onClick={handleUpload}
-          disabled={disable || files.length === 0}
+    <div className="upload-action flex items-center justify-between gap-4">
+  {user === null && (
+    <div onClick={() => { navigate("/login") }} className="bg-yellow-50 border border-yellow-300 text-yellow-800 px-4 py-2 rounded-lg text-sm font-medium shadow-sm">
+      Please log in to upload files
+    </div>
+  )}
+  
+  <button
+    className="upload-btn bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 rounded-lg shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed"
+    onClick={handleUpload}
+    disabled={loading || files.length === 0 || disable || user === null}
+  >
+    {loading ? "Uploading..." : "Upload"}
+  </button>
+</div>
 
-        //   disabled={loading || files.length === 0}
-        >
-          {1===3 ? "Uploading..." : "Upload"}
-        </button>
-      </div>
     </div>
   );
 };

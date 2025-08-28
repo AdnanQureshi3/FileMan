@@ -14,7 +14,7 @@ import Footer from "./Footer";
 const UserDashBoard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("home");
+  const [activeTab, setActiveTab] = useState("upload");
 
   useEffect(() => {
     const timeout = setTimeout(() => setLoading(false), 1500);
