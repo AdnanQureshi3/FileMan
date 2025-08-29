@@ -25,7 +25,7 @@ function Login() {
         console.log(input);
         try {
             setloading(true);
-            const res = await axios.post(`http://localhost:3000/api/user/login`, input, {
+            const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/user/login`, input, {
                 headers: {'Content-Type': 'application/json'},
                 withCredentials: true
             });

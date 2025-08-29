@@ -11,7 +11,7 @@ function PayButton({ disabled , plan }) {
     const handlePayment = async () => {
         try {
             const { data } = await axios.post(
-                "http://localhost:3000/api/razorpay/create-order",
+                `${import.meta.env.VITE_API_URL}/api/razorpay/create-order`,
                 { amount: plan.price }
             );
             
@@ -35,7 +35,7 @@ function PayButton({ disabled , plan }) {
                 order_id: data.orderId,
                 handler: async function (response) {
                     try {
-                        const res = await axios.post("http://localhost:3000/api/razorpay/verify-payment", {
+                        const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/razorpay/verify-payment`, {
                             ...response,
                             paymentDetails
                         });

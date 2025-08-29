@@ -9,12 +9,14 @@ import UploadPage from "./UploadPage";
 import FileShow from "./FileShow";
 // import Logout from "./Logout";
 import PurchasePage from "./PurchasePage";
+import { useSelector } from "react-redux";
 import Footer from "./Footer";
 
 const UserDashBoard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("upload");
+  const {user} = useSelector((state) => state.auth);
 
   useEffect(() => {
     const timeout = setTimeout(() => setLoading(false), 1500);
@@ -40,7 +42,7 @@ const UserDashBoard = () => {
         {/* sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} */}
         <Header  />
         <main className="flex-1 p-6 mt-20">
-          {activeTab === "upload" && <UploadPage setActiveTab={setActiveTab}  />}
+          { activeTab === "upload" && <UploadPage setActiveTab={setActiveTab}  />}
           {activeTab === "profile" && <ProfilePage />}
           {activeTab === "settings" && <ProfilePage />}
           {activeTab === "files" && <MyFilePage />}
