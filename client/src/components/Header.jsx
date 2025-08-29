@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 
-function Header() {
+
+function Header({ setActiveTab }) {
+  const { user } = useSelector((state) => state.auth);
   const [mode, setModeState] = useState("light");
   const [theme, setThemeState] = useState("pink");
 
@@ -52,7 +55,7 @@ function Header() {
             {mode === "light" ? "🌞" : "🌙"}
           </button>
 
-          <div className="flex space-x-2">
+          {/* <div className="flex space-x-2">
             {Object.keys(colorMap).map((c) => (
               <button
                 key={c}
@@ -62,40 +65,81 @@ function Header() {
                 }`}
               />
             ))}
-          </div>
+          </div> */}
 
-          <Link to="/signup" className="px-4 py-1 border rounded-full hover:bg-blue-500 hover:text-white transition">
-            Sign Up
-          </Link>
-          <Link to="/login" className="px-4 py-1 border rounded-full hover:bg-purple-500 hover:text-white transition">
-            Log In
-          </Link>
+          {
+            user === null ? (
+              <>
+                <Link to="/signup" className="px-4 py-1 border rounded-full hover:bg-purple-500 hover:text-white transition">
+                  Sign Up
+                </Link>
+
+                <Link to="/login" className="px-4 py-1 border rounded-full hover:bg-purple-500 hover:text-white transition">
+                  Log In
+                </Link>
+              </>
+            ) : (
+              <div
+                onClick={() => setActiveTab("profile")}
+                className="flex items-center gap-2 pl-2 pr-4 py-1 rounded-full cursor-pointer 
+             bg-gray-100 hover:bg-purple-500 hover:text-white transition"
+              >
+                <img
+                  src={user?.profile || "/default_profile.png"}
+                  alt="Profile"
+                  className="w-8 h-8 rounded-full border border-gray-300 object-cover"
+                />
+                <span className="font-medium">Profile</span>
+              </div>
+
+            )
+          }
+
+
+
         </div>
       </header>
 
-      
-   {/* MOBILE HEADER */}
-<header className="sm:hidden fixed top-0 left-0 w-full px-4 py-3 bg-[var(--bg-color)] shadow-md z-50 flex flex-row justify-between">
-  <Link to="/" className="flex flex-col items-center">
-    <img src='/logo.png' alt="Logo" className="w-12 h-12 rounded-full" />
-    <span className="font-bold text-lg text-[var(--primary-text)] mt-1">FileMan</span>
-  </Link>
 
-  <div className="flex items-center space-x-2 mt-2">
-    <Link
-      to="/signup"
-      className="px-3 py-1 border rounded-full hover:bg-blue-500 hover:text-white text-sm"
-    >
-      Sign Up
-    </Link>
-    <Link
-      to="/login"
-      className="px-3 py-1 border rounded-full hover:bg-purple-500 hover:text-white text-sm"
-    >
-      Log In
-    </Link>
-  </div>
-</header>
+      {/* MOBILE HEADER */}
+      <header className="sm:hidden fixed top-0 left-0 w-full px-4 py-3 bg-[var(--bg-color)] shadow-md z-50 flex flex-row justify-between">
+        <Link to="/" className="flex flex-col items-center">
+          <img src='/logo.png' alt="Logo" className="w-12 h-12 rounded-full" />
+          <span className="font-bold text-lg text-[var(--primary-text)] mt-1">FileMan</span>
+        </Link>
+
+        <div className="flex items-center space-x-2 mt-2">
+
+          {
+            user === null ? (
+              <>
+                <Link to="/signup" className="px-4 py-1 border rounded-full hover:bg-purple-500 hover:text-white transition">
+                  Sign Up
+                </Link>
+
+                <Link to="/login" className="px-4 py-1 border rounded-full hover:bg-purple-500 hover:text-white transition">
+                  Log In
+                </Link>
+              </>
+            ) : (
+              <div
+                onClick={() => setActiveTab("profile")}
+                className="flex items-center gap-2 pl-2 pr-4 py-1 rounded-full cursor-pointer 
+             bg-gray-100 hover:bg-purple-500 hover:text-white transition"
+              >
+                <img
+                  src={user?.profile || "/default_profile.png"}
+                  alt="Profile"
+                  className="w-8 h-8 rounded-full border border-gray-300 object-cover"
+                />
+                <span className="font-medium">Profile</span>
+              </div>
+
+            )
+          }
+
+        </div>
+      </header>
 
     </>
   );

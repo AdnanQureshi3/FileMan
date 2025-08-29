@@ -40,11 +40,11 @@ const UserDashBoard = () => {
       )}
       <div className="flex flex-col flex-1">
         {/* sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} */}
-        <Header  />
+        <Header setActiveTab={setActiveTab}  />
         <main className="flex-1 p-6 mt-20">
           { activeTab === "upload" && <UploadPage setActiveTab={setActiveTab}  />}
-          {activeTab === "profile" && <ProfilePage />}
-          {activeTab === "settings" && <ProfilePage />}
+          {activeTab === "profile" && <ProfilePage user={user} />}
+          {activeTab === "settings" && <ProfilePage user={user} />}
           {activeTab === "files" && <MyFilePage />}
           {activeTab === "plans" && <PurchasePage />}
           {activeTab === "logout" && <PurchasePage />}
