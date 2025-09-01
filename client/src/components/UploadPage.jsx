@@ -1,13 +1,11 @@
 import React, { useRef, useState } from "react";
-import "./FileUploader.css";
 import { useDispatch, useSelector } from "react-redux";
 import { uploadFile } from '../Redux/Slice/file/fileThunk.js'
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { MdCloudUpload, MdInfoOutline, MdDeleteForever } from "react-icons/md";
 
-
-
-const FileUploader = ({setActiveTab}) => {
+const FileUploader = ({ setActiveTab }) => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
   const dispatch = useDispatch();
@@ -19,7 +17,7 @@ const FileUploader = ({setActiveTab}) => {
   const [password, setPassword] = useState("");
   const [enableExpiry, setEnableExpiry] = useState(false);
   const [expiryDate, setExpiryDate] = useState("");
-  const [disable , setDisable] = useState(false);
+  const [disable, setDisable] = useState(false);
   const limit = user?.filesizeLimit || 10;
   const memoryLeft = user?.memoryLeft || 25;
   let countFileGreaterThanLimit = 0;
@@ -29,11 +27,10 @@ const FileUploader = ({setActiveTab}) => {
   };
 
   const handleFiles = (fileList) => {
-    let tempUsedMemory = files.reduce((acc, f) => acc + f.size, 0); // used memory
+    let tempUsedMemory = files.reduce((acc, f) => acc + f.size, 0);
     let newFiles = [];
 
     Array.from(fileList).forEach((file) => {
-
       if (file.size > limit * 1024 * 1024) {
         setDisable(true);
         countFileGreaterThanLimit++;
@@ -80,14 +77,12 @@ const FileUploader = ({setActiveTab}) => {
       countFileGreaterThanLimit--;
     }
 
-    // recalc memory usage
     const totalUsedMemory = files
       .filter((_, i) => i !== index)
       .reduce((acc, f) => acc + f.size, 0);
     if (totalUsedMemory <= memoryLeft * 1024 * 1024 && countFileGreaterThanLimit === 0) {
       setDisable(false);
     }
-
     toast.info("File removed");
   };
 
@@ -116,10 +111,7 @@ const FileUploader = ({setActiveTab}) => {
       formData.append("password", password);
     }
 
-
-
     try {
-
       await dispatch(uploadFile(formData)).unwrap();
       console.log("Uploaded");
       toast.success("Files uploaded successfully!");
@@ -131,207 +123,194 @@ const FileUploader = ({setActiveTab}) => {
   };
 
   return (
-    <div className="container bg-[var(--bg-color)] text-[var(--text-color)] p-6 rounded-lg shadow-md">
-      <div className="header bg-[var(--bg-color)] text-[var(--text-color)] text-center mb-6">
-        <h1>File Upload</h1>
-        <p>Drag & drop files or click to browse</p>
-      </div>
+    <div className="container mx-auto px-4 py-8 md:px-6 lg:px-8">
+      <div className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 p-6 md:p-10 rounded-xl shadow-lg transition-colors duration-300">
 
-      <div
-        className="dropbox"
-        onClick={handleBrowseClick}
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-      >
-        <div className="dropbox-icon">📁</div>
-        <div className="dropbox-text">Drop files here</div>
-        <div className="dropbox-subtext">
-          Supported formats: JPG, PNG, PDF, MP4, MOV, AVI, MKV (Max {limit}MB)
+        {/* Header */}
+        <div className="header text-center mb-8">
+          <h1 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-blue-600 to-blue-900 dark:from-blue-400 dark:to-blue-700 text-transparent bg-clip-text">File Upload</h1>
+          <p className="mt-2 text-gray-500 dark:text-gray-400">Drag & drop files or click to browse</p>
         </div>
-        {disable && (
-          <div className="flex justify-between items-center bg-red-100 text-red-700 px-4 py-2 rounded-md mt-2 text-sm font-medium">
-            <p>⚠️ File size or memory limit exceeded</p>
-            <button
-              className="bg-blue-600 hover:bg-blue-700 z-50  text-white px-3 py-1 rounded-md text-xs font-semibold transition-transform transform hover:scale-105"
-               onClick={(e) => {
-    e.stopPropagation(); // ⬅ stops the browse click
-    setActiveTab("plans");
-  }}
-            >
-              Upgrade to Premium
-            </button>
+
+        {/* Dropbox */}
+        <div
+          className={`dropbox relative flex flex-col items-center justify-center p-12 sm:p-20 text-center border-2 border-dashed rounded-3xl cursor-pointer transition-all duration-300 ease-in-out group
+          ${disable
+              ? 'border-red-500 bg-red-50 dark:border-red-700 dark:bg-red-900'
+              : 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-800'
+            }`}
+          onClick={handleBrowseClick}
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+        >
+          <MdCloudUpload className="text-5xl text-blue-600 dark:text-blue-400 mb-4 transition-transform duration-300 group-hover:scale-110" />
+          <div className="text-xl font-semibold">Drop files here</div>
+          <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Supported formats: JPG, PNG, PDF, MP4, MOV, AVI, MKV (Max {limit}MB)
+          </div>
+          {disable && (
+            <div className="flex justify-between items-center bg-red-100 dark:bg-red-800 text-red-700 dark:text-red-200 px-4 py-2 rounded-md mt-4 text-sm font-medium w-full">
+              <p className="flex items-center gap-2"><MdInfoOutline /> File size or memory limit exceeded</p>
+              <button
+                className="bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white px-3 py-1 rounded-md text-xs font-semibold transition transform hover:scale-105"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveTab("plans");
+                }}
+              >
+                Upgrade to Premium
+              </button>
+            </div>
+          )}
+          <button
+            className="browse-btn mt-6 px-6 py-2 rounded-full font-semibold text-white transition-all duration-300 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleBrowseClick();
+            }}
+            // disabled={disable}
+          >
+            Browse Files
+          </button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            multiple
+            accept=".jpg,.jpeg,.webp,.png,.mp4,.avi,.mov,.mkv,.mk3d,.mks,.mka,.pdf"
+            onChange={handleFileInputChange}
+            className="hidden"
+          />
+        </div>
+
+        {/* Extra Options */}
+        <div className="extra-options mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 p-6 rounded-xl shadow-sm bg-gray-100 dark:bg-gray-700">
+          <div className="flex flex-col">
+            <label className="switch-label flex items-center justify-between mb-2 font-medium">
+              <span className="label-text text-gray-700 dark:text-gray-300">Set Password</span>
+              <label className="switch relative inline-block w-14 h-8">
+                <input
+                  type="checkbox"
+                  checked={enablePassword}
+                  onChange={(e) => setEnablePassword(e.target.checked)}
+                  className="opacity-0 w-0 h-0 peer"
+                />
+                <span className="slider absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 rounded-full transition-all duration-300 peer-checked:bg-blue-600 before:absolute before:content-[''] before:h-6 before:w-6 before:left-1 before:bottom-1 before:bg-white before:rounded-full before:transition-all before:duration-300 peer-checked:before:translate-x-6"></span>
+              </label>
+            </label>
+            {enablePassword && (
+              <input
+                type="password"
+                className="password-input mt-2 w-full p-3 rounded-md border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors"
+                placeholder="Enter password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            )}
+          </div>
+
+          <div className="flex flex-col">
+            <label className="switch-label flex items-center justify-between mb-2 font-medium">
+              <span className="label-text text-gray-700 dark:text-gray-300">Set Expiry Date</span>
+              <label className="switch relative inline-block w-14 h-8">
+                <input
+                  type="checkbox"
+                  checked={enableExpiry}
+                  onChange={(e) => setEnableExpiry(e.target.checked)}
+                  className="opacity-0 w-0 h-0 peer"
+                />
+                <span className="slider absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300 rounded-full transition-all duration-300 peer-checked:bg-blue-600 before:absolute before:content-[''] before:h-6 before:w-6 before:left-1 before:bottom-1 before:bg-white before:rounded-full before:transition-all before:duration-300 peer-checked:before:translate-x-6"></span>
+              </label>
+            </label>
+            {enableExpiry && (
+              <input
+                type="datetime-local"
+                className="expiry-input mt-2 w-full p-3 rounded-md border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors"
+                value={expiryDate}
+                onChange={(e) => setExpiryDate(e.target.value)}
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Upload Stats and Previews */}
+        {files.length > 0 && (
+          <div className="upload-stats mt-6 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+            <div className="stats-header p-4 bg-gray-100 dark:bg-gray-700">
+              <h2 className="stats-title text-lg font-semibold">Upload Summary</h2>
+            </div>
+            <div className="stats-info bg-gray-50 dark:bg-gray-900 p-4">
+              <div className="flex justify-between items-center text-sm font-medium">
+                <span className="text-gray-600 dark:text-gray-400">Total Files:</span>
+                <span className="text-gray-900 dark:text-white font-bold">{files.length}</span>
+              </div>
+              <div className="flex justify-between items-center text-sm font-medium mt-1">
+                <span className="text-gray-600 dark:text-gray-400">Total Size:</span>
+                <span className="text-gray-900 dark:text-white font-bold">
+                  {totalSize > 1024 * 1024
+                    ? `${(totalSize / (1024 * 1024)).toFixed(2)} MB`
+                    : `${(totalSize / 1024).toFixed(2)} KB`}
+                </span>
+              </div>
+              <div className="progress-bar w-full bg-gray-200 dark:bg-gray-700 h-2.5 mt-4 rounded-full overflow-hidden">
+                <div
+                  className={`progress-fill h-full rounded-full transition-all duration-300 ${disable ? 'bg-red-500' : 'bg-blue-500'
+                    }`}
+                  style={{
+                    width: `${Math.min((totalSize / (limit * 1024 * 1024)) * 100, 100)}%`,
+                  }}
+                />
+              </div>
+            </div>
           </div>
         )}
 
-        <button
-          className="browse-btn"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleBrowseClick();
-          }}
-        >
-          Browse Files
-        </button>
-        <input
-          type="file"
-          ref={fileInputRef}
-          multiple
-          accept=".jpg,.jpeg,.webp,.png,.mp4,.avi,.mov,.mkv,.mk3d,.mks,.mka,.pdf"
-          onChange={handleFileInputChange}
-        />
-      </div>
-
-      <div className="extra-options bg-[var(--bg-color)] text-[var(--text-color)] mt-6">
-        <div className="switch-container">
-          <label className="switch-label">
-            <span className="label-text">Set Password</span>
-            <label className="switch">
-              <input
-                type="checkbox"
-                checked={enablePassword}
-                onChange={(e) => setEnablePassword(e.target.checked)}
-              />
-              <span className="slider"></span>
-            </label>
-          </label>
-          {enablePassword && (
-            <input
-              type="password"
-              className="password-input"
-              placeholder="Enter password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          )}
-        </div>
-
-        <div className="switch-container">
-          <label className="switch-label">
-            <span className="label-text">Set Expiry Date</span>
-            <label className="switch">
-              <input
-                type="checkbox"
-                checked={enableExpiry}
-                onChange={(e) => setEnableExpiry(e.target.checked)}
-              />
-              <span className="slider"></span>
-            </label>
-          </label>
-          {enableExpiry && (
-            <input
-              type="datetime-local"
-              className="expiry-input"
-              value={expiryDate}
-              onChange={(e) => setExpiryDate(e.target.value)}
-            />
-          )}
-        </div>
-      </div>
-
-      {files.length > 0 && (
-        <div className="upload-stats">
-          <div className="stats-header">
-            <div className="stats-title">Upload Summary</div>
-          </div>
-          <div className="stats-info">
-            <div className="stat-item">
-              <div className="stat-value">{files.length}</div>
-              <div className="stat-label">Files</div>
-            </div>
-            <div className="stat-item">
-              <div className="stat-value">
-                {(totalSize / 1024).toFixed(2)} KB
-              </div>
-              <div className="stat-label">Total Size</div>
-            </div>
-          </div>
-          <div className="progress-bar" style={{ marginTop: "15px" }}>
-            <div
-              className="progress-fill"
-              style={{
-                width: `${Math.min(
-                  (totalSize / (5 * 1024 * 1024)) * 100,
-                  100
-                )}%`,
-              }}
-            />
-          </div>
-        </div>
-      )}
-
-      {files.length === 0 ? (
-        <div className="empty-state">No files uploaded yet</div>
-      ) : (
-        <div className="file-previews">
-          {files.map((file, index) => (
-            <div className="file-preview" key={index}>
-              <div className="preview-img-container">
-                {file.type.startsWith("image") ? (
-                  <img
-                    src={URL.createObjectURL(file)}
-                    alt={file.name}
-                    className="preview-img"
-                  />
-                ) : file.type.startsWith("video") ? (
-                  <video
-                    src={URL.createObjectURL(file)}
-                    className="preview-video"
-                    controls
-                    muted
-                    width="100"
-                    height="80"
-                  />
-                ) : (
-                  <div className="file-icon">📄</div>
-                )}
-              </div>
-              <div className="file-info">
-                <div className="file-name" title={file.name}>
-                  {(() => {
-                    const dotIndex = file.name.lastIndexOf(".");
-                    const name = file.name.slice(0, dotIndex);
-                    const ext = file.name.slice(dotIndex);
-                    return name.length > 30
-                      ? `${name.slice(0, 27)}...${ext}`
-                      : file.name;
-                  })()}
+        {/* File Previews */}
+        {files.length === 0 ? (
+          <div className="empty-state mt-8 text-center text-gray-400 dark:text-gray-600 font-medium">No files uploaded yet</div>
+        ) : (
+          <div className="file-previews mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {files.map((file, index) => (
+              <div className="file-preview flex items-center p-3 rounded-lg bg-gray-50 dark:bg-gray-700 shadow-sm transition-transform duration-200 hover:scale-105" key={index}>
+                <div className="preview-img-container flex-shrink-0 w-16 h-16 rounded-md overflow-hidden flex items-center justify-center bg-gray-200 dark:bg-gray-600">
+                  {file.type.startsWith("image") ? (
+                    <img src={URL.createObjectURL(file)} alt={file.name} className="preview-img object-cover w-full h-full" />
+                  ) : file.type.startsWith("video") ? (
+                    <video src={URL.createObjectURL(file)} className="preview-video object-cover w-full h-full" muted />
+                  ) : (
+                    <div className="file-icon text-4xl">📄</div>
+                  )}
                 </div>
-                <div className="file-size">
-                  {file.size > 1024 * 1024
-                    ? `${(file.size / (1024 * 1024)).toFixed(2)} MB`
-                    : `${(file.size / 1024).toFixed(2)} KB`}
+                <div className="file-info flex-1 ml-4 overflow-hidden">
+                  <div className="file-name text-sm font-medium truncate" title={file.name}>{file.name}</div>
+                  <div className="file-size text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {file.size > 1024 * 1024 ? `${(file.size / (1024 * 1024)).toFixed(2)} MB` : `${(file.size / 1024).toFixed(2)} KB`}
+                  </div>
                 </div>
-                <div className="file-actions">
+                <div className="file-actions flex-shrink-0 ml-2">
                   <button
-                    className="remove-btn"
+                    className="remove-btn text-gray-400 hover:text-red-500 transition-colors duration-200"
                     onClick={() => removeFile(index)}
                   >
-                    Remove
+                    <MdDeleteForever className="text-2xl" />
                   </button>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+        )}
+
+        {/* Upload Action */}
+        <div className="upload-action flex justify-end items-center gap-4 mt-8 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <button
+            className="upload-btn bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold px-6 py-2 rounded-lg shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={handleUpload}
+            disabled={loading || files.length === 0 || disable}
+          >
+            {loading ? "Uploading..." : "Upload"}
+          </button>
         </div>
-      )}
-
-    <div className="upload-action flex items-center  justify-between gap-4">
-  {user === null && (
-    <div onClick={() => { navigate("/login") }} className="bg-yellow-50 border cursor-pointer hover:underline border-yellow-300 text-yellow-800 px-4 py-2 rounded-lg text-sm font-medium shadow-sm">
-      Please log in to upload files
-    </div>
-  )}
-  
-  <button
-    className="upload-btn bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 rounded-lg shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed"
-    onClick={handleUpload}
-    disabled={loading || files.length === 0 || disable || user === null}
-  >
-    {loading ? "Uploading..." : "Upload"}
-  </button>
-</div>
-
+      </div>
     </div>
   );
 };

@@ -1,9 +1,10 @@
 import React from "react";
+import { useTheme } from "../Hooks/ThemeContext.jsx";
 
 
 function Footer({setActiveTab}) {
-  const [mode, setMode] = React.useState("light");
-  const toggleMode = () => setMode(mode === "light" ? "dark" : "light");
+  const { theme, toggleTheme } = useTheme();
+ 
 
   const socialIcons = [
     { href: "https://www.linkedin.com/in/adnan-qureshi-73b86624a/", src: "https://cdn-icons-png.flaticon.com/512/174/174857.png", alt: "LinkedIn" },
@@ -45,7 +46,7 @@ function Footer({setActiveTab}) {
       </footer>
 
       {/* Mobile Bottom Nav */}
-      <div className="sm:hidden fixed bottom-0 left-0 w-full bg-[var(--bg-color)] text-[var(--text-color)] shadow-t z-50 flex justify-around items-center py-2">
+      <div className="sm:hidden z-50 fixed bottom-0 left-0 w-full bg-[var(--bg-color)] text-[var(--text-color)] shadow-t z-50 flex justify-around items-center py-2">
         <div onClick={() => ActiveTabHandler("home")} className="flex flex-col items-center cursor-pointer">
           🏠 <span className="text-xs">Home</span>
         </div>
@@ -61,8 +62,8 @@ function Footer({setActiveTab}) {
         <div  onClick={() => ActiveTabHandler("plans")} className="flex flex-col cursor-pointer items-center">
           💎 <span className="text-xs">Plans</span>
         </div>
-        <button onClick={toggleMode} className="flex flex-col items-center">
-          {mode === "light" ? "🌞" : "🌙"} <span className="text-xs">Mode</span>
+        <button onClick={toggleTheme} className="flex flex-col items-center">
+          {theme === "light" ? "🌞" : "🌙"} <span className="text-xs">{theme}</span>
         </button>
       </div>
     </>

@@ -47,11 +47,11 @@ const FilePage = () => {
     }) || [];
 
   return (
-    <div className="w-full flex flex-col mt-6">
+  <div className="w-full flex flex-col mt-6 bg-gray-100  transition-colors">
   {/* Header */}
   <div className="mb-4 flex flex-col gap-2">
-    <h2 className="text-lg font-bold">📁 Your Files</h2>
-    <p className="text-sm text-gray-500">
+    <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">📁 Your Files</h2>
+    <p className="text-sm text-gray-500 dark:text-gray-400">
       {filteredFiles.length} file{filteredFiles.length !== 1 && "s"}
     </p>
   </div>
@@ -69,59 +69,55 @@ const FilePage = () => {
     />
   </div>
 
-  {/* 📱 Mobile / Tablet View → Cards */}
   <div className="grid gap-4 md:hidden">
     {filteredFiles.map((file) => {
       const isExpired = new Date(file.expiresAt) <= new Date();
       return (
         <div
           key={file._id}
-          className="bg-white rounded-2xl shadow p-4 flex flex-col gap-3 border border-gray-200"
+          className="bg-white dark:bg-gray-700 rounded-2xl shadow-md dark:shadow-gray-600 p-4 flex flex-col gap-3 border border-gray-200 dark:border-gray-600 transition-colors"
         >
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-semibold text-gray-800 truncate max-w-[200px]">
+            <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100 truncate max-w-[200px]">
               {file.name}
             </h3>
             <span
               className={`text-xs px-2 py-1 rounded-full ${
                 isExpired
-                  ? "bg-red-100 text-red-600"
-                  : "bg-green-100 text-green-600"
+                  ? "bg-red-100 text-red-600 dark:bg-red-200 dark:text-red-700"
+                  : "bg-green-100 text-green-600 dark:bg-green-200 dark:text-green-700"
               }`}
             >
               {isExpired ? "Expired" : "Active"}
             </span>
           </div>
 
-          <p className="text-sm text-gray-500">
-            Type: {file.type.split("/")[0]} •{" "}
-            {(file.size / 1024 / 1024).toFixed(2)} MB
+          <p className="text-sm text-gray-500 dark:text-gray-300">
+            Type: {file.type.split("/")[0]} • {(file.size / 1024 / 1024).toFixed(2)} MB
           </p>
 
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-gray-400 dark:text-gray-400">
             Expires: {new Date(file.expiresAt).toLocaleDateString()}
           </p>
 
           <div className="flex gap-3">
-            <button
-              onClick={() => setPreviewFile(file)}
-              className="flex-1 bg-blue-600 text-white py-2 rounded-lg text-sm"
-            >
+            <button onClick={() => setPreviewFile(file)}
+             className="flex-1 bg-blue-600 dark:bg-blue-500 text-white py-2 rounded-lg text-sm hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors">
               Preview
             </button>
             <button
-              onClick={() => setShareFile(file)}
-              className="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg text-sm"
-            >
+            onClick={() => setShareFile(file)}
+            className="flex-1 bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200 py-2 rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors">
               Share
-            </button>
+              </button>
           </div>
         </div>
       );
+
     })}
   </div>
 
-  {/* 💻 Desktop view (keep your table) */}
+
   <div className="hidden md:block overflow-x-auto">
     <FileTable
       files={filteredFiles}
@@ -134,13 +130,10 @@ const FilePage = () => {
   </div>
 
   {/* Modals */}
-  {previewFile && (
-    <PreviewModal file={previewFile} onClose={() => setPreviewFile(null)} />
-  )}
-  {shareFile && (
-    <ShareModal file={shareFile} onClose={() => setShareFile(null)} />
-  )}
+  {previewFile && <PreviewModal file={previewFile} onClose={() => setPreviewFile(null)} />}
+  {shareFile && <ShareModal file={shareFile} onClose={() => setShareFile(null)} />}
 </div>
+
 
   );
 };

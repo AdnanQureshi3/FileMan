@@ -9,7 +9,6 @@ function FilesPage() {
     <div className="w-full px-4 py-6">
       <h1 className="text-xl font-bold mb-4">Your Files</h1>
 
-      {/* If no files */}
       {(!user?.files || user?.files.length === 0) && (
         <div className="text-center text-gray-500">
           <UploadCloud className="mx-auto h-12 w-12 mb-2" />
@@ -17,7 +16,7 @@ function FilesPage() {
         </div>
       )}
 
-      {/* File list */}
+ 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {user?.files?.map((file, idx) => (
           <div

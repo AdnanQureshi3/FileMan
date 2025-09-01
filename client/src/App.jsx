@@ -5,6 +5,7 @@ import Home from './components/Home'
 import FilePage from './components/FilePage.jsx'
 import UserDashBoard from './components/UserDashBoard'
 import PurchasePage from './components/PurchasePage.jsx'
+import { ThemeProvider } from './Hooks/ThemeContext.jsx'
 import { createBrowserRouter , RouterProvider } from 'react-router-dom'
 import VerifyPage from './components/VerifyPage.jsx'
 import './App.css'
@@ -54,11 +55,11 @@ function App() {
 
 
   return (
-       <>
+       <ThemeProvider>
    
     <RouterProvider router= {browserRouter}/>
    
-   </>
+   </ThemeProvider>
   )
 }
 

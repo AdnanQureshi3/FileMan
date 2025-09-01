@@ -18,7 +18,6 @@ const FileShow = () => {
   const [filterType, setFilterType] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
 
-  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -28,36 +27,45 @@ const FileShow = () => {
     }
   }, [user, dispatch]);
 
-  // Filter client-side
-  const filteredFiles =
-    files?.filter((file) => {
-      const nameMatch = file.name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
+  const getFilteredFiles = () => {
+    return (
+      files?.filter((file) => {
+        const nameMatch = file.name
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
 
-      const typeMatch = filterType ? file.type === filterType : true;
+        const typeMatch = filterType ? file.type === filterType : true;
 
-      const statusMatch = filterStatus
-        ? filterStatus === "expired"
-          ? new Date(file.expiresAt) <= new Date()
-          : new Date(file.expiresAt) > new Date()
-        : true;
+        const statusMatch = filterStatus
+          ? filterStatus === "expired"
+            ? new Date(file.expiresAt) <= new Date()
+            : new Date(file.expiresAt) > new Date()
+          : true;
 
-      return nameMatch && typeMatch && statusMatch;
-    }) || [];
+        return nameMatch && typeMatch && statusMatch;
+      }) || []
+    );
+  };
+
+  const filteredFiles = getFilteredFiles();
 
   return (
-    <div className="w-full flex flex-col mt-6">
+    <div className="w-full flex flex-col mt-6 bg-gray-50 dark:bg-gray-900 p-6 rounded-lg shadow-md">
       {/* Header */}
-      <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-        <h2 className="text-lg md:text-xl font-bold">📁 Your Uploaded Files</h2>
-        <p className="text-sm text-gray-500">
-          Showing {filteredFiles.length} file{filteredFiles.length !== 1 && "s"}
+      <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between border-b border-gray-200 dark:border-gray-700 pb-4">
+        <h2 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100">
+          📁 Your Uploaded Files
+        </h2>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          <span className="font-semibold text-gray-900 dark:text-gray-200">
+            {filteredFiles.length}
+          </span>{" "}
+          file{filteredFiles.length !== 1 && "s"} found
         </p>
       </div>
 
       {/* Filters */}
-      <div className="mb-4">
+      <div className="mb-6">
         <FileFilter
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
@@ -69,8 +77,8 @@ const FileShow = () => {
         />
       </div>
 
-      {/* Table (scrolls horizontally on small screens) */}
-      <div className="overflow-x-auto">
+      {/* File Table */}
+      <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg shadow-inner">
         <FileTable
           files={filteredFiles}
           currentPage={currentPage}

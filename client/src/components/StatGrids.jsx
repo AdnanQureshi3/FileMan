@@ -1,19 +1,15 @@
-import React, { useEffect, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
-
-
+import React from "react";
+import { useSelector } from "react-redux";
 import WelcomeSection from "./WelcomeSection";
 
 const StatsGrid = () => {
-  const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
-//   const hasFetched = useRef(false);
 
   const cards = [
     {
       title: "Total Uploads",
       value: user?.totalUploads ?? 0,
-      icon: "📤",
+      icon: "📦",
     },
     {
       title: "Total Downloads",
@@ -21,55 +17,49 @@ const StatsGrid = () => {
       icon: "📥",
     },
     {
-      title: "Videos Uploaded",
+      title: "Videos",
       value: user?.videoCount ?? 0,
-      icon: "🎬",
+      icon: "📹",
     },
     {
-      title: "Images Uploaded",
+      title: "Images",
       value: user?.imageCount ?? 0,
       icon: "🖼️",
     },
     {
-      title: "Documents Uploaded",
+      title: "Documents",
       value: user?.documentCount ?? 0,
       icon: "📄",
     },
     {
       title: "Last Login",
       value: user?.lastLogin ? new Date(user.lastLogin).toLocaleString() : "N/A",
-      icon: "⏰",
+      icon: "🚀",
     },
   ].filter((card) => card.value !== undefined);
 
   return (
-    <div className="mt-6">
-      {/* Welcome Message */}
+    <div className="mt-6 px-4 sm:px-0">
       <WelcomeSection user={user} />
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {cards.map((card, index) => (
           <div
             key={index}
-            className="relative p-5 rounded-xl bg-white dark:bg-gray-900 shadow-md transition hover:shadow-lg"
+            className="p-4 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center justify-between space-x-4"
           >
-            {/* Top Gradient Border */}
-            <div className="absolute top-0 left-0 w-full h-1 rounded-t-xl bg-[var(--primary-gradient)]" />
-
-            {/* Icon */}
-            <div className="flex items-center justify-center h-full gap-10">
-              {/* <div className="w-20 h-20 mb-4 bg-[var(--primary-soft)] text-[var(--primary-text)] rounded-xl flex items-center justify-center text-xl">
-                {card.icon}
-              </div> */}
-              <div className="text-center">
-                <p className="text-2xl font-semibold text-[var(--primary-text)]">{card.value}</p>
-                <p className="text-gray-600 dark:text-gray-300 mt-1 text-sm">{card.title}</p>
-              </div>
+            {/* Icon and Title */}
+            <div className="flex items-center space-x-3">
+              <span className="text-xl sm:text-2xl">{card.icon}</span>
+              <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 truncate">
+                {card.title}
+              </p>
             </div>
-           
 
-            
+            {/* Value */}
+            <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-50">
+              {card.value}
+            </p>
           </div>
         ))}
       </div>
