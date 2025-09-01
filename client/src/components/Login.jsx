@@ -99,7 +99,7 @@ function Login() {
         {/* Right: Illustration */}
         <div className="hidden md:flex w-[65%] bg-purple-50 items-center justify-center p-6">
           <img
-            src='/themeImg.png'
+            src='https://res.cloudinary.com/dxqntcbd9/image/upload/v1756721753/themeImg_mivhjm.png'
             alt="File Sharing Illustration"
             className="w-full drop-shadow-xl"
           />

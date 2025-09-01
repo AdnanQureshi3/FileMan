@@ -29,7 +29,7 @@ const userSchema = mongoose.Schema({
     },
     profile:{
         type:String,
-        default:"default_profile"
+        default:"https://res.cloudinary.com/dxqntcbd9/image/upload/v1750397077/yeycpd77fsqme2ghuslb.jpg"
     },
     total_upload:{
         type:Number,
@@ -63,6 +63,15 @@ const userSchema = mongoose.Schema({
     memoryLeft:{
         type:Number,
         default:25
+    },
+    plan:{
+        type:String,
+        enum:["free","premium Basic" , "premium Pro"],
+        default:"free"
+    },
+    memoryUsed:{
+        type:Number,
+        default:0
     },
 
     documentCount: { type: Number, default: 0 },

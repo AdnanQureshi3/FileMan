@@ -8,6 +8,7 @@ import MyFilePage from "./MyFilePage";
 import UploadPage from "./UploadPage";
 import FileShow from "./FileShow";
 // import Logout from "./Logout";
+import FilePage from "./FilePage";
 import PurchasePage from "./PurchasePage";
 import { useSelector } from "react-redux";
 import Footer from "./Footer";
@@ -46,7 +47,7 @@ const UserDashBoard = () => {
           { activeTab === "upload" && <UploadPage setActiveTab={setActiveTab}  />}
           {activeTab === "profile" && <ProfilePage user={user} />}
           
-          {activeTab === "files" && <MyFilePage />}
+          {activeTab === "files" && <FilePage />}
           {activeTab === "plans" && <PurchasePage />}
           {activeTab === "logout" && <PurchasePage />}
           {activeTab === "home" && 
