@@ -11,6 +11,7 @@ import FileShow from "./FileShow";
 import PurchasePage from "./PurchasePage";
 import { useSelector } from "react-redux";
 import Footer from "./Footer";
+import DesktopOnly from "../Ui/DeskTopOnly";
 
 const UserDashBoard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -44,7 +45,7 @@ const UserDashBoard = () => {
         <main className="flex-1 p-6 mt-20">
           { activeTab === "upload" && <UploadPage setActiveTab={setActiveTab}  />}
           {activeTab === "profile" && <ProfilePage user={user} />}
-          {activeTab === "settings" && <ProfilePage user={user} />}
+          
           {activeTab === "files" && <MyFilePage />}
           {activeTab === "plans" && <PurchasePage />}
           {activeTab === "logout" && <PurchasePage />}
@@ -53,7 +54,12 @@ const UserDashBoard = () => {
            <>
           {/* <Home /> */}
           <StatsGrid />
+
+          <DesktopOnly>
           <FileShow />
+           
+          </DesktopOnly>
+         
          </>
            }
            

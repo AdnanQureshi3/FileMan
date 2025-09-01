@@ -9,9 +9,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, setActiveTab, activeTab }) => {
   const tabs = [
     { name: "Home", icon: "🏠", id: "home" },
     { name: "Upload Files", icon: "📤", id: "upload" },
-    { name: "Settings", icon: "⚙️", id: "settings" },
+    { name: "Profile", icon: "👤", id: "profile" },
+    { name: "Plans", icon: "💎", id: "plans" },
     { name: "Logout", icon: "🚪", id: "logout" },
-    { name: "Plans", icon: "�", id: "plans" },
   ];
 
   return (

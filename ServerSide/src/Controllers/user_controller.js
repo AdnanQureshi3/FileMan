@@ -175,3 +175,38 @@ export const purchasePremium = async ({ paymentDetails }) => {
     return { success: false, message: "Something went wrong." };
   }
 };
+
+export const verifyuser = async (req, res) => {
+    try {
+        const {otp} = req.body;
+        const id = req.id;
+        console.log("Verifying user with OTP:", otp, "for user ID:", id);
+        const user = await User.findById(id);
+        if(user.otpExpiry < Date.now()){
+            return res.status(401).json({
+                message: "OTP expired.",
+                success: false
+            });
+        }
+
+        if(user.otp != otp ){
+            return res.status(401).json({
+                message: "Invalid OTP.",
+                success: false
+            });
+        }
+
+        user.isVerified = true;
+        user.otp = undefined;
+        user.otpExpiry = undefined;
+        await user.save();
+
+        return res.status(200).json({
+            message: "User verified successfully.",
+            success: true
+        });
+    }
+    catch(error){
+        
+    }
+}

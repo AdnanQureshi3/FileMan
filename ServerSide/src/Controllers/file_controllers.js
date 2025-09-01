@@ -28,8 +28,7 @@ const uploadFiles = async (req, res) => {
       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
       region: process.env.AWS_REGION,
     });
-    // console.log(process.env.AWS_ACCESS_KEY_ID, process.env.AWS_SECRET_ACCESS_KEY, process.env.AWS_REGION);
-    
+   
     const savedFiles = [];
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ error: 'User not found' });
@@ -567,11 +566,13 @@ const file = await File.findOne({ shortUrl });
   }
 };
 
-const verifyFilePassword = async (req, res) => {
+const verifyFilePassword = async (req, res) => 
+  {
   const { shortCode, password } = req.body;
+  
 
   try {
-    const file = await File.findOne({ shortUrl: `/f/${shortCode}` });
+    const file = await File.findOne({ shortUrl:`/f/${shortCode}` });
     if (!file || !file.isPasswordProtected)
       return res.status(400).json({ success: false, error: "File not protected or not found" });
 
