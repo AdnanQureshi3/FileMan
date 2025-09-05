@@ -1,85 +1,142 @@
-import React, { useState, useEffect } from "react";
-import { toast } from 'react-toastify';
-import axios from "axios";
+import React, { useState, useEffect } from "react"
+import { toast } from "react-toastify"
+import axios from "axios"
+import { X } from "lucide-react"
 
-export default function OtpVerification() {
-  const [otp, setOtp] = useState("");
-  const [timeLeft, setTimeLeft] = useState(60);
-  const [canResend, setCanResend] = useState(false);
+export default function OtpVerification({ open, setOpen }) {
+  const [otp, setOtp] = useState("")
+  const [timeLeft, setTimeLeft] = useState(60)
+  const [canResend, setCanResend] = useState(false)
+
+  
+  useEffect(() => {
+    if (!open) return
+    resetState()
+  }, [open])
+
 
   useEffect(() => {
-    if (timeLeft > 0) {
-      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-      return () => clearTimeout(timer);
-    } else {
-      setCanResend(true);
+    if (!open || timeLeft <= 0) {
+      setCanResend(true)
+      return
     }
-  }, [timeLeft]);
+    const timer = setTimeout(() => setTimeLeft((t) => t - 1), 1000)
+    return () => clearTimeout(timer)
+  }, [timeLeft, open])
+
+  const resetState = () => {
+    setOtp("")
+    setTimeLeft(60)
+    setCanResend(false)
+  }
 
   const handleSubmit = async () => {
+    if (otp.length !== 6) {
+      toast.error("Please enter a valid 6-digit OTP.")
+      return
+    }
     try {
-      if (otp.length < 6) {
-        toast.error("Please enter a valid 6-digit OTP.");
-        return;
-      }
-      console.log("Verifying OTP..." , import.meta.env.VITE_API_URL);
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/user/verify-otp/`, { otp },
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/user/verify-otp/`,
+        { otp },
         { withCredentials: true }
-      );
+      )
       if (res.data.success) {
-        toast.success("OTP Verified!");
-      } else {
-        toast.error(res.data.message);
+        toast.success("Account verified successfully!")
+        setOpen(false)
       }
     } catch (error) {
-      console.log(error.response.data);
-      toast.error("OTP verification failed. Please try again.");
-    }
-  };
+  const msg = error.response?.data?.message || "OTP verification failed"
+  toast.error(msg)
+}
 
-  const handleResend = () => {
-    setTimeLeft(60);
+  }
+
+  const handleResend = async () => {
     setCanResend(false);
-    toast.success("OTP resent!");
-  };
+    setTimeLeft(60);
+
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/user/send-otp`,
+        { withCredentials: true }
+      )
+      if (res.data.success) {
+        toast.success("OTP sent again!")
+       
+      } else {
+        toast.error(res.data.message || "Failed to send OTP.")
+        setCanResend(true);
+        setTimeLeft(0);
+      }
+    } catch (error) {
+
+      console.error(error.response?.data || error.message)
+      toast.error("Failed to resend OTP.")
+    }
+  }
+
+  if (!open) return null
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-2xl shadow-lg w-96 text-center">
-        <h1 className="text-2xl font-bold mb-4">Verify OTP</h1>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+      <div className="relative bg-gradient-to-br from-white to-gray-100 dark:from-gray-900 dark:to-gray-800 w-full max-w-md rounded-2xl shadow-2xl p-8 border border-gray-200 dark:border-gray-700 animate-fadeIn">
+        {/* Close */}
+        <button
+          onClick={() => setOpen(false)}
+          className="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition-colors"
+        >
+          <X className="w-6 h-6" />
+        </button>
+
+      
+        <h1 className="text-3xl font-extrabold mb-6 text-center bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
+          OTP Verification
+        </h1>
+
+       
         <input
           type="text"
           maxLength="6"
           value={otp}
           onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-          className="border p-3 w-full rounded-lg text-center tracking-widest text-xl"
+          className="border border-gray-300 dark:border-gray-700 p-4 w-full rounded-xl text-center tracking-widest text-2xl font-semibold 
+          focus:outline-none focus:ring-4 focus:ring-blue-400/50 dark:bg-gray-800 dark:text-white transition shadow-inner"
           placeholder="Enter 6-digit OTP"
         />
+
+        {/* Submit */}
         <button
           onClick={handleSubmit}
-          disabled={otp.length < 6}
-          className={`w-full mt-4 p-3 rounded-lg text-white font-semibold ${
-            otp.length < 6 ? "bg-gray-400" : "bg-blue-500 hover:bg-blue-600"
+          disabled={otp.length !== 6}
+          className={`w-full mt-6 py-3 rounded-xl font-bold text-lg transition-all duration-300 ${
+            otp.length !== 6
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-md hover:shadow-lg"
           }`}
         >
-          Submit OTP
+          Verify OTP
         </button>
 
-        <div className="mt-4">
+        {/* Resend Section */}
+        <div className="mt-6 text-center">
           {canResend ? (
             <button
               onClick={handleResend}
-              className="text-blue-500 hover:underline"
+              className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
             >
               Resend OTP
             </button>
           ) : (
-            <p className="text-gray-600">
-              Resend OTP in <span className="font-semibold">{timeLeft}s</span>
+            <p className="text-gray-600 dark:text-gray-400">
+              Resend OTP in{" "}
+              <span className="inline-block px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded-full text-gray-800 dark:text-gray-200 font-semibold">
+                {timeLeft}s
+              </span>
             </p>
           )}
         </div>
       </div>
     </div>
-  );
+  )
 }

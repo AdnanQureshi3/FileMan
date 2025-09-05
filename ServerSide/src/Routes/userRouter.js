@@ -8,7 +8,7 @@ const router = express.Router();
 router.route('/register').post(register)
 router.post('/login' , login);
 router.delete('/delete', isAuthanticated, deleteUser);
-router.post('/send-otp',isAuthanticated, sendOtp);
+router.get('/send-otp',isAuthanticated, sendOtp);
 router.post('/verify-otp', isAuthanticated, verifyuser);
 
 

@@ -90,13 +90,14 @@ export const login = async(req , res) =>{
             await user.save();
         }
         const { password: _, ...safeUser } = user._doc;
-
-        
-        return res.status(200).json({
-            message: "Login successful.",
+         res.cookie('token', token, { httpOnly: true, secure:true , sameSite: 'none', maxAge: 1 * 24 * 60 * 60 * 1000 }).json({
+            message: `Welcome back ${user.username}`,
             success: true,
-            user: safeUser
+            user:safeUser,
+            token
         });
+
+
     }
     catch (error) {
         console.log(error);
@@ -180,7 +181,7 @@ export const verifyuser = async (req, res) => {
     try {
         const {otp} = req.body;
         const id = req.id;
-        console.log("Verifying user with OTP:", otp, "for user ID:", id);
+        // console.log("Verifying user with OTP:", otp, "for user ID:", id);
         const user = await User.findById(id);
         if(user.otpExpiry < Date.now()){
             return res.status(401).json({

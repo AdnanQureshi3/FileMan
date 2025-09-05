@@ -1,6 +1,9 @@
 import React from "react";
 
+import OtpVerification from "./VerifyPage";
+
 function ProfilePage({ user }) {
+  const [open, setOpen] = React.useState(false);
   if (!user) return <p className="text-center text-gray-500 dark:text-gray-300">Loading...</p>;
 
   const usedStorage = user.memoryLeft;
@@ -37,23 +40,32 @@ function ProfilePage({ user }) {
             {usedStorage} MB used of {user.TotalSizeLimit} MB ({usagePercent}%)
           </p>
         </div>
+        <OtpVerification open={open} setOpen={setOpen} />
 
         <div className="grid grid-cols-2 gap-4 text-center">
           <StatCard label="File Limit" value={`${user.filesizeLimit} MB`} />
           <PremiumCard isPremium={user.isPremium} expiry={user.premiumExpiry} />
         </div>
 
-        <div className="mt-4 text-sm text-center sm:text-left">
-          <span
-            className={`px-3 py-1 rounded-full text-xs font-medium ${
-              user.isVerified
-                ? "bg-green-100 dark:bg-green-700 text-green-700 dark:text-green-100"
-                : "bg-red-100 dark:bg-red-700 text-red-700 dark:text-red-100"
-            }`}
-          >
-            {user.isVerified ? "Verified Account" : "Not Verified"}
-          </span>
-        </div>
+       <div className="mt-4 text-sm text-center sm:text-left">
+  {user.isVerified ? (
+    <span className="px-4 py-1.5 rounded-full text-sm font-medium 
+      bg-green-100 dark:bg-green-700 text-green-700 dark:text-green-100">
+      Verified
+    </span>
+  ) : (
+   <button
+  onClick={() => setOpen(true)}
+  className="px-4 py-2 rounded-lg text-sm font-medium  bg-green-600 text-white 
+             hover:bg-green-700 active:scale-95 shadow-sm hover:shadow-md transition-all duration-200"
+>
+  Verify
+</button>
+
+  )}
+</div>
+
+
 
         {user.files?.length > 0 && (
           <div className="mt-6">
