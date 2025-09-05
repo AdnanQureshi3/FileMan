@@ -2,11 +2,14 @@ import React, { useState, useEffect } from "react"
 import { toast } from "react-toastify"
 import axios from "axios"
 import { X } from "lucide-react"
+import { useDispatch } from "react-redux"
+import { setAuthUser } from "../Redux/Slice/auth.js"
 
 export default function OtpVerification({ open, setOpen }) {
   const [otp, setOtp] = useState("")
-  const [timeLeft, setTimeLeft] = useState(60)
+  const [timeLeft, setTimeLeft] = useState(0)
   const [canResend, setCanResend] = useState(false)
+  const dispatch = useDispatch()
 
   
   useEffect(() => {
@@ -44,6 +47,7 @@ export default function OtpVerification({ open, setOpen }) {
       if (res.data.success) {
         toast.success("Account verified successfully!")
         setOpen(false)
+        dispatch(setAuthUser(res.data.user))
       }
     } catch (error) {
   const msg = error.response?.data?.message || "OTP verification failed"

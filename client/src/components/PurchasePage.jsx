@@ -79,7 +79,7 @@ function PurchasePage() {
               </button>
             ) : (
               <div className="mt-auto">
-                <PayButton disabled={user === null} plan={plan} />
+                <PayButton plan={plan} />
               </div>
             )}
           </div>

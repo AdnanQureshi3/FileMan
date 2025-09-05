@@ -144,7 +144,8 @@ export const deleteUser = async(req , res)=>{
 }
 export const purchasePremium = async ({ paymentDetails }) => {
     console.log("Processing premium purchase...", paymentDetails);
-  const userId = paymentDetails.user;
+  const userId = paymentDetails.userId;
+  console
   if (!userId) {
     return { success: false, message: "User not authenticated." };
   }
@@ -154,23 +155,26 @@ export const purchasePremium = async ({ paymentDetails }) => {
     if (!user) {
       return { success: false, message: "User not found." };
     }
+    if(user.isVerified === false){
+        return { success: false, message: "Please verify your email to purchase premium." };
+      }
 
-    // if (user.isPremium) {
-    //   return { success: false, message: "User is already a premium member." };
-    // }
+  if(user.plan === paymentDetails.plan && user.isPremium === true){
+    return { success: false, message: `You are already on the ${user.plan} plan.` };
+  }
 
-    // Update user premium details
     user.isPremium = true;
     user.filesizeLimit = paymentDetails.filesizeLimit;
     user.TotalSizeLimit = paymentDetails.totalSizeLimit;
     user.premiumExpiry = new Date(
       Date.now() + paymentDetails.days * 24 * 60 * 60 * 1000
     );
-    user.isVerified = false;
+    user.plan = paymentDetails.plan;
+    
 
     await user.save();
 
-    return { success: true, message: "Premium membership purchased successfully." };
+    return { success: true, message: "Premium membership purchased successfully."};
   } catch (error) {
     console.log(error);
     return { success: false, message: "Something went wrong." };
@@ -204,7 +208,8 @@ export const verifyuser = async (req, res) => {
 
         return res.status(200).json({
             message: "User verified successfully.",
-            success: true
+            success: true,
+            user
         });
     }
     catch(error){

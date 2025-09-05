@@ -36,8 +36,10 @@ router.post("/verify-payment", async (req, res) => {
 
   if (razorpay_signature === expectedSign) {
 
-    purchasePremium({ paymentDetails });
+  const result = await purchasePremium({ paymentDetails });
+  console.log("Purchase result:", result);
     const user = await User.findById(paymentDetails.userId).select("-password");
+    console.log("Payment verified and premium activated for user:", user);
   
     
     res.json({ success: true, message: "Payment verified, premium activated", user });

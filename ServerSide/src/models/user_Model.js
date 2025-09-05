@@ -66,8 +66,8 @@ const userSchema = mongoose.Schema({
     },
     plan:{
         type:String,
-        enum:["free","premium Basic" , "premium Pro"],
-        default:"free"
+        enum:["Free","Premium Basic" , "Premium Pro"],
+        default:"Free"
     },
     memoryUsed:{
         type:Number,
