@@ -1,9 +1,38 @@
 import nodemailer from "nodemailer";
 import User from "../models/user_Model.js";
-function HTMLForEmail(otp , need){
-  let html = ``;
-  if(need == "verification"){
-    html = ` <div style="font-family: Arial, sans-serif; background-color:#f4f6f8; padding:30px;">
+
+export const sendOtpForVerification = async (req , res) => {
+    try{
+   
+      console.log("sending otp");
+        const savedUser = await User.findOne({ _id: req.id });
+        if (!savedUser) {
+            return res.status(404).json({ message: "User not found" , success:false });
+        }
+       
+        const email = savedUser.email;
+        const otp = Math.floor(100000 + Math.random() * 900000);
+
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        });
+        console.log("email send opt send")
+        
+       savedUser.otp = otp.toString();
+
+        savedUser.otpExpiry = Date.now() + 15 * 60 * 1000; // 15 minutes expiry
+        await savedUser.save();
+
+        // Send OTP email                       
+        await transporter.sendMail({
+    from: `"FileMan" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: "FileMan | Email Verification",
+    html:  ` <div style="font-family: Arial, sans-serif; background-color:#f4f6f8; padding:30px;">
       <div style="max-width:600px; margin:0 auto; background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
         
         <div style="background:#4f46e5; padding:20px; text-align:center;">
@@ -33,8 +62,49 @@ function HTMLForEmail(otp , need){
         </div>
       </div>
     </div>`
-  }
-  else html = `<div style="font-family: Arial, sans-serif; background-color:#f4f6f8; padding:30px;">
+});
+
+        res.status(200).json({ message: "OTP sent successfully" , success:true });
+    }
+    catch(error){
+        console.error("Error sending OTP:", error);
+        res.status(500).json({ message: "Internal server error" , success:false });
+    }
+}
+export const sendOtpForResetPassword = async (req , res) => {
+    try{
+      
+      console.log("sending otp");
+      const {email } = req.body;
+      const savedUser = await User.findOne({email});
+      console.log(savedUser , email)
+      if (!savedUser) {
+            return res.status(404).json({ message: "User not found" , success:false });
+        }
+       
+        
+        const otp = Math.floor(100000 + Math.random() * 900000);
+
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        });
+        console.log("email send opt send")
+        
+       savedUser.otp = otp.toString();
+
+        savedUser.otpExpiry = Date.now() + 15 * 60 * 1000; // 15 minutes expiry
+        await savedUser.save();
+
+        // Send OTP email                       
+        await transporter.sendMail({
+    from: `"FileMan" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: "FileMan | Email Verification",
+    html: `<div style="font-family: Arial, sans-serif; background-color:#f4f6f8; padding:30px;">
   <div style="max-width:600px; margin:0 auto; background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
     
     <div style="background:#4f46e5; padding:20px; text-align:center;">
@@ -64,42 +134,6 @@ function HTMLForEmail(otp , need){
   </div>
 </div>
 `
-
-return html;
-
-}
-export const sendOtp = async (req , res) => {
-    try{
-      const {need } = req.body;
-      console.log("sending otp");
-        const savedUser = await User.findOne({ _id: req.id });
-        if (!savedUser) {
-            return res.status(404).json({ message: "User not found" , success:false });
-        }
-       
-        const email = "adnanq262@gmail.com";
-        const otp = Math.floor(100000 + Math.random() * 900000);
-
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
-            },
-        });
-        console.log("email send opt send")
-        
-       savedUser.otp = otp.toString();
-
-        savedUser.otpExpiry = Date.now() + 15 * 60 * 1000; // 15 minutes expiry
-        await savedUser.save();
-
-        // Send OTP email
-        await transporter.sendMail({
-    from: `"FileMan" <${process.env.EMAIL_USER}>`,
-    to: email,
-    subject: "FileMan | Email Verification",
-    html: HTMLForEmail(otp , need)
 });
 
         res.status(200).json({ message: "OTP sent successfully" , success:true });

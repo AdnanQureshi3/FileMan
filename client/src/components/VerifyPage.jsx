@@ -65,8 +65,7 @@ export default function OtpVerification({ open, setOpen  ,need}) {
 
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/user/send-otp`,
-        {need},
+        `${import.meta.env.VITE_API_URL}/api/user/send-otpVerification`,
         { withCredentials: true }
       )
       if (res.data.success) {

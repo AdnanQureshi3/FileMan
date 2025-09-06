@@ -35,8 +35,8 @@ function ResetPassword() {
     }
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/user/verify-otp`,
-        { otp, need: "Reset" },
+        `${import.meta.env.VITE_API_URL}/api/user/verify-otpForPasswordreset`,
+        { otp , email},
         { withCredentials: true }
       )
       if (res.data.success) {
@@ -54,8 +54,8 @@ function ResetPassword() {
     setTimeLeft(60)
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/user/send-otp`,
-        { need: "Reset" },
+        `${import.meta.env.VITE_API_URL}/api/user/send-otpResetPassword`,
+        {email} ,
         { withCredentials: true }
       )
       if (res.data.success) {

@@ -104,11 +104,11 @@ function Login() {
                 <p
   className="cursor-pointer"
   onClick={async () => {
-    localStorage.setItem("resetEmail", input.email); // store email
-    navigate(`/resetpassword`)
-    const exists = true;
-    // await isEmailExistHandler();
+   
+    const exists = await isEmailExistHandler();
     if (exists) {
+       localStorage.setItem("resetEmail", input.email); // store email
+    navigate(`/resetpassword`)
       return;
 
     } else {

@@ -216,6 +216,41 @@ export const verifyuser = async (req, res) => {
         
     }
 }
+export const verifyOTPForPasswordreset = async (req, res) => {
+    try {
+        const {otp , email} = req.body;
+     
+        console.log("Verifying user with OTP:", otp, "for user ID:", email);
+        const  user = await User.findOne({ email });
+        if(user.otpExpiry < Date.now()){
+            return res.status(401).json({
+                message: "OTP expired.",
+                success: false
+            });
+        }
+
+        if(user.otp != otp ){
+            return res.status(401).json({
+                message: "Invalid OTP.",
+                success: false
+            });
+        }
+
+        user.isVerified = true;
+        user.otp = undefined;
+        user.otpExpiry = undefined;
+        await user.save();
+
+        return res.status(200).json({
+            message: "User verified successfully.",
+            success: true,
+            user
+        });
+    }
+    catch(error){
+        
+    }
+}
 
 export const resetPassword = async(req , res) =>{
     console.log("reseting password");
