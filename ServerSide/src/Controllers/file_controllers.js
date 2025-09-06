@@ -15,7 +15,7 @@ dotenv.config();
 
 
 const uploadFiles = async (req, res) => {
-  // console.log("uploading... in backend" , req.files);
+  console.log("uploading... in backend" , req.files);
   if (!req.files || req.files.length === 0) {
     return res.status(400).json({ error: 'No files uploaded' });
   }
@@ -28,9 +28,11 @@ const uploadFiles = async (req, res) => {
       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
       region: process.env.AWS_REGION,
     });
-   
-    const savedFiles = [];
     const user = await User.findById(userId);
+    let availableSpace = user.TotalSizeLimit - user.UsedStorage;
+    let SpaceUsed = 0;
+
+    const savedFiles = [];
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     for (const file of req.files) {
@@ -38,6 +40,11 @@ const uploadFiles = async (req, res) => {
       const extension = path.extname(originalName);
       const uniqueSuffix = shortid.generate();
       const finalFileName = `${originalName.replace(/\s+/g, '_')}_${uniqueSuffix}${extension}`;
+
+      if(file.size/(1024*1024) > availableSpace){
+        return res.status(400).json({ error: `Insufficient storage space. You can upload files up to ${availableSpace / (1024 * 1024)} MB.` });
+      }
+      
 
       const params = {
         Bucket: process.env.AWS_BUCKET_NAME,
@@ -49,6 +56,7 @@ const uploadFiles = async (req, res) => {
       const s3Result = await s3.upload(params).promise();
       const fileUrl = s3Result.Location;
       const shortCode = shortid.generate();
+      
 
       const fileObj = {
         path: fileUrl,
@@ -63,6 +71,8 @@ const uploadFiles = async (req, res) => {
         shortUrl: `/f/${shortCode}`,
         createdBy: userId,
       };
+      availableSpace -= file.size/(1024*1024);
+      SpaceUsed += file.size/(1024*1024);
 
       if (isPassword === 'true') {
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -75,12 +85,13 @@ const uploadFiles = async (req, res) => {
       savedFiles.push(savedFile);
 
       // Update user stats
-      user.totalUploads += 1;
+      user.total_upload += 1;
       if (file.mimetype.startsWith('image/')) user.imageCount += 1;
       else if (file.mimetype.startsWith('video/')) user.videoCount += 1;
       else if (file.mimetype.startsWith('application/')) user.documentCount += 1;
     }
-
+    
+    user.UsedStorage += SpaceUsed;
     await user.save();
 
     return res.status(201).json({
@@ -103,7 +114,6 @@ const downloadInfo = async (req, res) => {
     if (!file) {
       return res.status(404).json({ error: 'File not found' });
     }
-
     if (file.status !== 'active') {
       return res.status(403).json({ error: 'This file is not available for download' });
     }
@@ -123,16 +133,17 @@ const downloadInfo = async (req, res) => {
     const params = {
       Bucket: process.env.AWS_BUCKET_NAME,
       Key: `file-share-app/${file.name}`,
-      ResponseContentDisposition: `attachment; filename="${file.name}"` // 🟢 Force download
+      ResponseContentDisposition: `attachment; filename="${file.name}"`
     };
 
     const command = new GetObjectCommand(params);
-    const downloadUrl = await getSignedUrl(s3, command, { expiresIn: 24 * 60 * 60 }); // 24 hours
+    const downloadUrl = await getSignedUrl(s3, command, { expiresIn: 24 * 60 * 60 }); //1 day
 
     file.downloadedContent++;
     await file.save();
 
     // Update user download count
+
     const user = await User.findById(file.createdBy);
     if (user) {
       user.totalDownloads += 1;
@@ -232,13 +243,25 @@ const downloadFile = async (req, res) => {
 
 
 const deleteFile = async (req, res) => {
-     const { fileId } = req.params;
+  const { fileId } = req.params;
+  const UserId = req.id;
+  console.log("Delete request received" , UserId);
 
-     try {
-        const file=await file.findById(fileId);
+  
+  try {
+      const user = await User.findById(UserId);
+      if(!user){
+        return res.status(404).json({error:'User not found'});
+      }
+        const file=await File.findById(fileId);
+        const size = file.size;
 
+        
         if(!file){
           return res.status(404).json({error:'File not found'});
+        }
+        if(user._id.toString() !== file.createdBy.toString()){
+          return res.status(403).json({error:'Unauthorized to delete this file'});
         }
 
         if(file.status==='deleted'){
@@ -259,6 +282,8 @@ const deleteFile = async (req, res) => {
         await s3.deleteObject(params).promise();
         
          await File.deleteOne({ _id: fileId });
+         user.UsedStorage -= size;
+         await user.save();
 
         return res.status(200).json({message:'File deleted successfully'});
      }catch(error) {

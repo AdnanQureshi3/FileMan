@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.8.2",
+    "@shadcn/ui": "^0.0.4",
     "axios": "^1.11.0",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.23.12",

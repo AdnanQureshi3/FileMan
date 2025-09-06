@@ -3,6 +3,7 @@ const PreviewModal = ({ file, onClose }) => {
   if (!file) return null;
 
   // ✅ Use URL.createObjectURL only if it’s a real File object
+  
   const previewUrl =
     file instanceof File
       ? URL.createObjectURL(file)

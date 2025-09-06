@@ -69,11 +69,13 @@ const userSchema = mongoose.Schema({
         enum:["Free","Premium Basic" , "Premium Pro"],
         default:"Free"
     },
-    memoryUsed:{
+    UsedStorage:{
         type:Number,
         default:0
     },
 
+    imageCount:{ type: Number, default: 0 },
+    videoCount: { type: Number, default: 0 },
     documentCount: { type: Number, default: 0 },
 }, {timestamps:true})
 

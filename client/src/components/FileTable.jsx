@@ -1,7 +1,9 @@
 import React from 'react';
 import { formatDistanceToNowStrict, differenceInDays } from "date-fns";
-import { MdOutlineDownload, MdOutlineContentCopy, MdOutlineShare, MdRemoveRedEye, MdOutlineTimer, MdArrowBackIosNew, MdArrowForwardIos } from 'react-icons/md';
-
+import { MdOutlineDownload, MdOutlineContentCopy,MdDelete , MdOutlineShare, MdRemoveRedEye, MdOutlineTimer, MdArrowBackIosNew, MdArrowForwardIos } from 'react-icons/md';
+import {deleteFile} from "../Redux/Slice/file/fileThunk.js"
+import { useDispatch } from 'react-redux';
+import FileActions from './FileActions.jsx';
 const FileTable = ({
   files,
   currentPage,
@@ -15,6 +17,8 @@ const FileTable = ({
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  const dispatch = useDispatch();
 
   const formatFileName = (filename) => {
     return filename.length > 20 ? `${filename.slice(0, 20)}...` : filename;
@@ -79,20 +83,8 @@ const FileTable = ({
                     </td>
                     <td className="px-4 py-3 text-sm text-right pr-6">
                       <div className="flex items-center justify-end space-x-2">
-                        <button
-                          onClick={() => setPreviewFile(file)}
-                          className="text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-500"
-                          title="Preview"
-                        >
-                          <MdRemoveRedEye className="w-5 h-5" />
-                        </button>
-                        <button
-                          onClick={() => setShareFile(file)}
-                          className="text-purple-500 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-500"
-                          title="Share"
-                        >
-                          <MdOutlineShare className="w-5 h-5" />
-                        </button>
+                       
+                      <FileActions file={file} setPreviewFile={setPreviewFile} setShareFile={setShareFile} />
                       </div>
                     </td>
                   </tr>

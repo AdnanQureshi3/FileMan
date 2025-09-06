@@ -13,6 +13,7 @@ const FileShow = () => {
 
   const [previewFile, setPreviewFile] = useState(null);
   const [shareFile, setShareFile] = useState(null);
+  // const [deleteFile]
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("");

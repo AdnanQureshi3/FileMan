@@ -6,8 +6,10 @@ function ProfilePage({ user }) {
   const [open, setOpen] = React.useState(false);
   if (!user) return <p className="text-center text-gray-500 dark:text-gray-300">Loading...</p>;
 
-  const usedStorage = user.memoryLeft;
-  const usagePercent = Math.min((usedStorage / user.TotalSizeLimit) * 100, 100).toFixed(0);
+  const memory = user?.UsedStorage;
+  const usedStorage = memory > 1 ? memory.toFixed(1) : memory.toFixed(2);
+  const percent = Math.min((usedStorage / user.TotalSizeLimit) * 100, 100);
+  const usagePercent = percent > 1? percent.toFixed(1) : percent.toFixed(2);
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-100 p-4">
@@ -64,9 +66,6 @@ function ProfilePage({ user }) {
 
   )}
 </div>
-
-
-
         {user.files?.length > 0 && (
           <div className="mt-6">
             <h3 className="text-md font-semibold text-gray-900 dark:text-gray-100 mb-2">

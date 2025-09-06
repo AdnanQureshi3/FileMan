@@ -8,12 +8,12 @@ const StatsGrid = () => {
   const cards = [
     {
       title: "Total Uploads",
-      value: user?.totalUploads ?? 0,
+      value: user?.total_upload ?? 0,
       icon: "📦",
     },
     {
       title: "Total Downloads",
-      value: user?.totalDownloads ?? 0,
+      value: user?.total_download ?? 0,
       icon: "📥",
     },
     {

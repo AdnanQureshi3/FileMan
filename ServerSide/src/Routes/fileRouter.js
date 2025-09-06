@@ -1,5 +1,6 @@
 import express, { Router } from "express"
 import upload from "../middlewares/Multer.js";
+import isAuthanticated from "../middlewares/Auth.js";
 import { deleteFile, downloadInfo, downloadFile, generateQR, generateShareShortenLink, getDownloadCount, getFileDetails, getUserFiles, resolveShareLink, searchFiles, sendLinkEmail, showUserFiles, updateAllFileExpiry, updateFileExpiry, updateFilePassword, updateFileStatus, uploadFiles, verifyFilePassword,   } from '../Controllers/file_controllers.js';
 
 
@@ -8,7 +9,7 @@ const router=Router();
 router.post("/upload", upload.array('files'), uploadFiles);
 
 router.get("/download/:fileId",downloadFile);
-router.delete("/delete/:fileId",deleteFile);
+router.delete("/delete/:fileId", isAuthanticated, deleteFile);
 router.put("/update/:fileId",updateFileStatus);
 router.get("/getFileDetails/:fileId",getFileDetails);
 router.post('/generateShareShortenLink', generateShareShortenLink);
