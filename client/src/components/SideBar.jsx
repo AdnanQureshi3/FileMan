@@ -1,8 +1,34 @@
 import React from "react";
+import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { setAuthUser } from "../Redux/Slice/auth";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { MdHome, MdFileUpload, MdAccountCircle, MdCardGiftcard, MdExitToApp } from "react-icons/md";
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen, setActiveTab, activeTab }) => {
+const dispatch = useDispatch();
+const navigate = useNavigate();
+  const logoutHandler = async () => {
+  try {
+   const res =  await axios.get(`${import.meta.env.VITE_API_URL}/api/user/logout`, { withCredentials: true });
+   console.log(res);
+    dispatch(setAuthUser(null));
+
+    
+    toast.success("Logged out successfully");
+    navigate("/login");
+  } catch (error) {
+    toast.error("Failed to logout");
+  }
+};
+
   const handleTabClick = (tab) => {
+    if(tab === "logout"){
+      logoutHandler();
+      return;
+    }
+
     setActiveTab(tab);
     setSidebarOpen(false);
   };

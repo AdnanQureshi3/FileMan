@@ -1,5 +1,5 @@
 import express from "express";
-import {register , login , deleteUser , verifyuser , isEmailExist , resetPassword , verifyOTPForPasswordreset} from '../Controllers/user_controller.js'
+import {register , login , deleteUser , verifyuser , isEmailExist , resetPassword, logout , verifyOTPForPasswordreset} from '../Controllers/user_controller.js'
 import { sendOtpForResetPassword , sendOtpForVerification } from "../Controllers/email_controller.js";
 import isAuthanticated from "../middlewares/Auth.js";
 const router = express.Router();
@@ -14,6 +14,7 @@ router.post('/verify-otp', isAuthanticated, verifyuser);
 router.post('/verify-otpForPasswordreset', verifyOTPForPasswordreset);
 router.post('/isemailexist' , isEmailExist);
 router.post('/resetpassword' , resetPassword);
+router.get('/logout' , logout);
 
 
 export default router;

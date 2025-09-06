@@ -49,7 +49,7 @@ const UserDashBoard = () => {
           
           {activeTab === "files" && <FilePage />}
           {activeTab === "plans" && <PurchasePage />}
-          {activeTab === "logout" && <PurchasePage />}
+          
           {activeTab === "home" && 
 
            <>

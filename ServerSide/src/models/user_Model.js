@@ -60,10 +60,7 @@ const userSchema = mongoose.Schema({
         type:Number,
         default:25
     },
-    memoryLeft:{
-        type:Number,
-        default:25
-    },
+   
     plan:{
         type:String,
         enum:["Free","Premium Basic" , "Premium Pro"],

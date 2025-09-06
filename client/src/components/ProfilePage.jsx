@@ -1,20 +1,41 @@
 import React from "react";
-
 import OtpVerification from "./VerifyPage";
-
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { toast } from "react-toastify";
+import { setAuthUser } from "../Redux/Slice/auth";
+import { useNavigate } from "react-router-dom";
 function ProfilePage({ user }) {
   const [open, setOpen] = React.useState(false);
-  if (!user) return <p className="text-center text-gray-500 dark:text-gray-300">Loading...</p>;
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const logoutHandler = async() => {
+      try {
+   const res =  await axios.get(`${import.meta.env.VITE_API_URL}/api/user/logout`, { withCredentials: true });
+   console.log(res);
+    dispatch(setAuthUser(null));
+
+    toast.success("Logged out successfully");
+    navigate("/login");
+  } catch (error) {
+    toast.error("Failed to logout");
+  }
+  };
+
+  if (!user)
+    return (
+      <p className="text-center text-gray-500 dark:text-gray-300">Loading...</p>
+    );
 
   const memory = user?.UsedStorage;
   const usedStorage = memory > 1 ? memory.toFixed(1) : memory.toFixed(2);
   const percent = Math.min((usedStorage / user.TotalSizeLimit) * 100, 100);
-  const usagePercent = percent > 1? percent.toFixed(1) : percent.toFixed(2);
+  const usagePercent = percent > 1 ? percent.toFixed(1) : percent.toFixed(2);
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-100 p-4">
       <div className="bg-white dark:bg-gray-800 shadow-xl rounded-2xl p-6 w-full max-w-xl border border-gray-200 dark:border-gray-700">
-
         <div className="flex flex-col sm:flex-row items-center gap-5">
           <img
             src={user.profile || "/default_profile.png"}
@@ -22,7 +43,9 @@ function ProfilePage({ user }) {
             className="w-24 h-24 rounded-full border-4 border-gray-200 dark:border-gray-600 shadow"
           />
           <div className="text-center sm:text-left">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{user.fullname}</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+              {user.fullname}
+            </h2>
             <p className="text-gray-600 dark:text-gray-300">@{user.username}</p>
             <p className="text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
           </div>
@@ -31,7 +54,9 @@ function ProfilePage({ user }) {
         <hr className="my-4 border-gray-200 dark:border-gray-700" />
 
         <div className="mb-5">
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Storage Usage</h3>
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
+            Storage Usage
+          </h3>
           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 relative overflow-hidden">
             <div
               className="h-4 bg-blue-500 dark:bg-blue-400 transition-all duration-500"
@@ -42,6 +67,7 @@ function ProfilePage({ user }) {
             {usedStorage} MB used of {user.TotalSizeLimit} MB ({usagePercent}%)
           </p>
         </div>
+
         <OtpVerification open={open} setOpen={setOpen} need={"Verification"} />
 
         <div className="grid grid-cols-2 gap-4 text-center">
@@ -49,23 +75,30 @@ function ProfilePage({ user }) {
           <PremiumCard isPremium={user.isPremium} expiry={user.premiumExpiry} />
         </div>
 
-       <div className="mt-4 text-sm text-center sm:text-left">
-  {user.isVerified ? (
-    <span className="px-4 py-1.5 rounded-full text-sm font-medium 
-      bg-green-100 dark:bg-green-700 text-green-700 dark:text-green-100">
-      Verified
-    </span>
-  ) : (
-   <button
-  onClick={() => setOpen(true)}
-  className="px-4 py-2 rounded-lg text-sm font-medium  bg-green-600 text-white 
-             hover:bg-green-700 active:scale-95 shadow-sm hover:shadow-md transition-all duration-200"
->
-  Verify
-</button>
+        <div className="mt-4 text-sm text-center sm:text-left">
+          {user.isVerified ? (
+            <span className="px-4 py-1.5 rounded-full text-sm font-medium bg-green-100 dark:bg-green-700 text-green-700 dark:text-green-100">
+              Verified
+            </span>
+          ) : (
+            <button
+              onClick={() => setOpen(true)}
+              className="px-4 py-2 rounded-lg text-sm font-medium bg-green-600 text-white hover:bg-green-700 active:scale-95 shadow-sm hover:shadow-md transition-all duration-200"
+            >
+              Verify
+            </button>
+          )}
+        </div>
 
-  )}
-</div>
+        <div className="mt-4 text-center">
+          <button
+            onClick={logoutHandler}
+            className="px-4 py-2 rounded-lg text-sm font-medium bg-red-600 text-white hover:bg-red-700 active:scale-95 shadow-sm hover:shadow-md transition-all duration-200"
+          >
+            Logout
+          </button>
+        </div>
+
         {user.files?.length > 0 && (
           <div className="mt-6">
             <h3 className="text-md font-semibold text-gray-900 dark:text-gray-100 mb-2">
@@ -77,7 +110,9 @@ function ProfilePage({ user }) {
                   key={idx}
                   className="flex justify-between items-center bg-gray-100 dark:bg-gray-700 rounded-lg px-4 py-2 text-sm"
                 >
-                  <span className="truncate text-gray-800 dark:text-gray-100 w-3/4">{file}</span>
+                  <span className="truncate text-gray-800 dark:text-gray-100 w-3/4">
+                    {file}
+                  </span>
                   <a
                     href={file}
                     target="_blank"
@@ -114,15 +149,8 @@ function PremiumCard({ isPremium, expiry }) {
           : "bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200"
       }`}
     >
-      <p className="text-lg font-semibold">
-        {isPremium ? "Premium Active" : "Free Plan"}
-      </p>
-      
-      {isPremium && (
-        <p className="text-xs">
-          Expiry: {new Date(expiry).toLocaleDateString()}
-        </p>
-      )}
+      <p className="text-lg font-semibold">{isPremium ? "Premium Active" : "Free Plan"}</p>
+      {isPremium && <p className="text-xs">Expiry: {new Date(expiry).toLocaleDateString()}</p>}
     </div>
   );
 }

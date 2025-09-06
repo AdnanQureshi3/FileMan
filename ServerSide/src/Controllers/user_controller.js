@@ -180,7 +180,19 @@ export const purchasePremium = async ({ paymentDetails }) => {
     return { success: false, message: "Something went wrong." };
   }
 };
+export const logout = async (req, res) => {
+    try {
+        console.log("logout")
+        return res.cookie('token', "", { maxAge: 0 }).json({
+            msg: "Logout successfully",
+            success: true
+        })
 
+    }
+    catch (err) {
+        console.log(err);
+    }
+};
 export const verifyuser = async (req, res) => {
     try {
         const {otp} = req.body;
