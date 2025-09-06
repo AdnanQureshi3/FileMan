@@ -5,6 +5,7 @@ import Home from './components/Home'
 import FilePage from './components/FilePage.jsx'
 import UserDashBoard from './components/UserDashBoard'
 import PurchasePage from './components/PurchasePage.jsx'
+import ResetPassword from './components/ResetPassword.jsx'
 import { ThemeProvider } from './Hooks/ThemeContext.jsx'
 import { createBrowserRouter , RouterProvider } from 'react-router-dom'
 import './App.css'
@@ -27,7 +28,6 @@ const browserRouter = createBrowserRouter([
         path:'/plans',
         element:<PurchasePage />
       }
-      
     ]
   }
   ,{
@@ -42,6 +42,10 @@ const browserRouter = createBrowserRouter([
      path:'/f/:shortCode',
      element:<DownloadPage />
    },
+   {
+    path:'/resetpassword',
+    element:<ResetPassword/>
+   }
  
 
 ])

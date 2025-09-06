@@ -91,7 +91,7 @@ function PayButton({ plan }) {
             >
                 Buy Premium
             </button>
-              <OtpVerification open={Open} setOpen={setOpen} />
+              <OtpVerification open={Open} setOpen={setOpen} need={"Verification"} />
 
             {showVerify && (
   <div className="fixed inset-0 z-50 flex items-center justify-center">

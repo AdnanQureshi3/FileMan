@@ -6,19 +6,37 @@ import { useNavigate  } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setAuthUser } from "../Redux/Slice/auth.js"
 
+
 function Login() {
     const [loading, setloading] = useState(false);
     const [input, setinput] = useState({
         email: "",
         password: ""
     });
+   
+
     const navigate = useNavigate();
     const dispatch = useDispatch();
     
 
     const ChangeEventHandler = (e) => {
         setinput({...input, [e.target.name]: e.target.value});
+        setisExist(false);
     };
+    async function isEmailExistHandler() {
+  try {
+    const res = await axios.post(
+      `${import.meta.env.VITE_API_URL}/api/user/isemailexist`,
+      { email: input.email },
+      { headers: { "Content-Type": "application/json" }, withCredentials: true }
+    );
+    return res.data.success; // true / false
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+}
+
 
      async function LoginHandler(e) {
         e.preventDefault();
@@ -82,6 +100,26 @@ function Login() {
                   className="w-full border rounded-xl px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-purple-500" 
                 />
               </div>
+              <div className='flex  justify-end text-sm text-blue-700 underline font-semibold'>
+                <p
+  className="cursor-pointer"
+  onClick={async () => {
+    localStorage.setItem("resetEmail", input.email); // store email
+    navigate(`/resetpassword`)
+    const exists = true;
+    // await isEmailExistHandler();
+    if (exists) {
+      return;
+
+    } else {
+      toast.error("No account with this email exists");
+    }
+  }}
+>
+  Forget Password?
+</p>
+
+              </div>
               <button 
                 type="submit" 
                 className="w-full bg-purple-600 text-white rounded-xl py-2.5 font-semibold hover:bg-purple-700 transition-colors"
@@ -95,6 +133,7 @@ function Login() {
             </form>
           </div>
         </div>
+        
 
         {/* Right: Illustration */}
         <div className="hidden md:flex w-[65%] bg-purple-50 items-center justify-center p-6">

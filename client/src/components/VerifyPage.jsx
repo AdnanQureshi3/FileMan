@@ -4,12 +4,14 @@ import axios from "axios"
 import { X } from "lucide-react"
 import { useDispatch } from "react-redux"
 import { setAuthUser } from "../Redux/Slice/auth.js"
+import { useNavigate } from "react-router-dom"
 
-export default function OtpVerification({ open, setOpen }) {
+export default function OtpVerification({ open, setOpen  ,need}) {
   const [otp, setOtp] = useState("")
-  const [timeLeft, setTimeLeft] = useState(0)
-  const [canResend, setCanResend] = useState(false)
-  const dispatch = useDispatch()
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [canResend, setCanResend] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   
   useEffect(() => {
@@ -46,6 +48,7 @@ export default function OtpVerification({ open, setOpen }) {
       )
       if (res.data.success) {
         toast.success("Account verified successfully!")
+        if(need === "Reset") navigate('/resetPassword')
         setOpen(false)
         dispatch(setAuthUser(res.data.user))
       }
@@ -61,8 +64,9 @@ export default function OtpVerification({ open, setOpen }) {
     setTimeLeft(60);
 
     try {
-      const res = await axios.get(
+      const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/user/send-otp`,
+        {need},
         { withCredentials: true }
       )
       if (res.data.success) {
@@ -96,6 +100,7 @@ export default function OtpVerification({ open, setOpen }) {
       
         <h1 className="text-3xl font-extrabold mb-6 text-center bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
           OTP Verification
+        <p>for {need}</p>
         </h1>
 
        

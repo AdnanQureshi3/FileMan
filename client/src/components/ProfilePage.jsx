@@ -42,7 +42,7 @@ function ProfilePage({ user }) {
             {usedStorage} MB used of {user.TotalSizeLimit} MB ({usagePercent}%)
           </p>
         </div>
-        <OtpVerification open={open} setOpen={setOpen} />
+        <OtpVerification open={open} setOpen={setOpen} need={"Verification"} />
 
         <div className="grid grid-cols-2 gap-4 text-center">
           <StatCard label="File Limit" value={`${user.filesizeLimit} MB`} />
