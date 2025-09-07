@@ -13,6 +13,7 @@ import PurchasePage from "./PurchasePage";
 import { useSelector } from "react-redux";
 import Footer from "./Footer";
 import DesktopOnly from "../Ui/DeskTopOnly";
+import FeedbackBox from "./FeedbackBox";
 
 const UserDashBoard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -45,10 +46,11 @@ const UserDashBoard = () => {
         <Header setActiveTab={setActiveTab}  />
         <main className="flex-1 p-6 mt-20">
           { activeTab === "upload" && <UploadPage setActiveTab={setActiveTab}  />}
-          {activeTab === "profile" && <ProfilePage user={user} />}
+          {activeTab === "profile" && <ProfilePage user={user}  setActiveTab={setActiveTab}/>}
           
           {activeTab === "files" && <FilePage />}
           {activeTab === "plans" && <PurchasePage />}
+          {activeTab === "feedback" && <FeedbackBox/>}
           
           {activeTab === "home" && 
 

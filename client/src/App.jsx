@@ -10,6 +10,7 @@ import { ThemeProvider } from './Hooks/ThemeContext.jsx'
 import { createBrowserRouter , RouterProvider } from 'react-router-dom'
 import './App.css'
 import DownloadPage from './components/DownloadPage.jsx'
+import FeedbackBox from './components/FeedbackBox.jsx'
 
 const browserRouter = createBrowserRouter([
   {
@@ -28,6 +29,10 @@ const browserRouter = createBrowserRouter([
         path:'/plans',
         element:<PurchasePage />
       }
+      ,{
+    path:'/send-feedback',
+    element:<FeedbackBox/>
+   }
     ]
   }
   ,{

@@ -3,9 +3,10 @@ import OtpVerification from "./VerifyPage";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
+import FeedbackBox from "./FeedbackBox";
 import { setAuthUser } from "../Redux/Slice/auth";
 import { useNavigate } from "react-router-dom";
-function ProfilePage({ user }) {
+function ProfilePage({ user , setActiveTab }) {
   const [open, setOpen] = React.useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -29,12 +30,12 @@ function ProfilePage({ user }) {
     );
 
   const memory = user?.UsedStorage;
-  const usedStorage = memory > 1 ? memory.toFixed(1) : memory.toFixed(2);
+  const usedStorage = memory > 1 ? memory?.toFixed(1) : memory?.toFixed(2);
   const percent = Math.min((usedStorage / user.TotalSizeLimit) * 100, 100);
-  const usagePercent = percent > 1 ? percent.toFixed(1) : percent.toFixed(2);
+  const usagePercent = percent > 1 ? percent?.toFixed(1) : percent?.toFixed(2);
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-100 p-4">
+    <div className="min-h-screen flex flex-col gap-4 justify-center items-center bg-gray-100 p-4">
       <div className="bg-white dark:bg-gray-800 shadow-xl rounded-2xl p-6 w-full max-w-xl border border-gray-200 dark:border-gray-700">
         <div className="flex flex-col sm:flex-row items-center gap-5">
           <img
@@ -46,8 +47,8 @@ function ProfilePage({ user }) {
             <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
               {user.fullname}
             </h2>
-            <p className="text-gray-600 dark:text-gray-300">@{user.username}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
+            <p className="text-gray-600 dark:text-gray-300">@{user?.username}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{user?.email}</p>
           </div>
         </div>
 
@@ -124,9 +125,24 @@ function ProfilePage({ user }) {
                 </li>
               ))}
             </ul>
+            
           </div>
         )}
+
       </div>
+   <div className="flex flex-col items-center justify-center space-y-4 p-6 bg-gray-50 rounded-2xl shadow-md">
+  <h1 className="text-md text-center font-bold text-gray-800">
+    Is there any problem you are suffering?
+  </h1>
+
+  <p
+    onClick={() => {setActiveTab("feedback")}}
+    className="inline-block cursor-pointer rounded-xl bg-indigo-600 px-6 py-3 text-white font-semibold shadow-md hover:bg-indigo-700 active:scale-95 transition"
+  >
+    Send Feedback
+  </p>
+</div>
+
     </div>
   );
 }
@@ -149,6 +165,7 @@ function PremiumCard({ isPremium, expiry }) {
           : "bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200"
       }`}
     >
+
       <p className="text-lg font-semibold">{isPremium ? "Premium Active" : "Free Plan"}</p>
       {isPremium && <p className="text-xs">Expiry: {new Date(expiry).toLocaleDateString()}</p>}
     </div>
