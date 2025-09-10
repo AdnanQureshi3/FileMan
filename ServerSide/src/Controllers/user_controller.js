@@ -2,7 +2,7 @@ import User from "../models/user_Model.js";
 import bcrypt from "bcryptjs"
 import jwt from 'jsonwebtoken'
 import dotenv from "dotenv";
-import { registerSchema } from "../../Validation/registerUserValidation.js";
+import { registerSchema  , loginSchema} from "../../Validation/UserValidation.js";
 dotenv.config();
 
 
@@ -13,12 +13,10 @@ export const register = async(req , res)=>{
     try {
         const { username, email, password } = req.body;
        const result = registerSchema.safeParse(req.body);
-        // console.log("Validation result:", data, error);
-        // console.log(result);
-
+     
         
 if (!result.success) {
-    // Now we are guaranteed that result.error exists
+    
     const err = result.error.issues[0].message;
     console.log(err);
     return res.status(400).json({
@@ -74,11 +72,23 @@ console.log("New User Created:", user._id);
 export const login = async(req , res) =>{
     console.log("Logging in user..." , req.body);
     try{
-       
+            const result = loginSchema.safeParse(req.body);
+            console.log(result);
+
+if (!result.success) {
+    
+    const err = result.error.issues[0].message;
+    console.log(err);
+    return res.status(400).json({
+        message: err,
+        success: false
+    });
+}
+
         const { email, password } = req.body;
         if (!email || !password) {
             return res.status(401).json({
-                msg: "Something is missing, please check.",
+                message: "Something is missing, please check.",
                 success: false,
             });
         }

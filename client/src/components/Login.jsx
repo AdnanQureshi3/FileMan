@@ -52,12 +52,12 @@ function Login() {
                 dispatch(setAuthUser(res.data.user));
                 navigate("/home");
            
-                toast.success("Login successful ");
+                toast.success(res.data.message);
                 setinput({email: "", password: ""});
             }
-        } catch(err) {
-            console.log(err);
-            toast.error("Wrong password or email");
+        } catch(error) {
+            console.log(error);
+           toast.error(error.response?.data?.message || "Login failed");
       
         } finally {
             setloading(false);
