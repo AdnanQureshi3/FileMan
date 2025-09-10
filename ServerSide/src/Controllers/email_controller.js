@@ -99,7 +99,7 @@ export const sendOtpForResetPassword = async (req , res) => {
         savedUser.otpExpiry = Date.now() + 15 * 60 * 1000; // 15 minutes expiry
         await savedUser.save();
 
-        // Send OTP email                       
+                  
         await transporter.sendMail({
     from: `"FileMan" <${process.env.EMAIL_USER}>`,
     to: email,
@@ -144,6 +144,7 @@ export const sendOtpForResetPassword = async (req , res) => {
     }
 }
 export const sendFeedback = async (req , res) => {
+  console.log("sending feedback");
     try{
       
       
@@ -164,7 +165,7 @@ export const sendFeedback = async (req , res) => {
       
 await transporter.sendMail({
   from: `"FileMan" <${process.env.EMAIL_USER}>`,
-  to: "adnanquresh262@gmail.com",
+  to: process.env.EMAIL_USER,
   subject: "FileMan | Feedback from Anonymous User",
   html: `<div style="font-family: Arial, sans-serif; background-color:#f4f6f8; padding:30px;">
   <div style="max-width:600px; margin:0 auto; background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.1);">

@@ -15,13 +15,16 @@ function FeedbackBox() {
     setLoading(true)
     setMessage("")
     try {
-      await axios.post(
+     const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/user/send-feedback`,
         { feedback },
         { withCredentials: true }
       )
-      setMessage("✅ Feedback sent successfully!")
-      setFeedback("")
+      if(res.data.success){
+        setMessage("✅ Feedback sent successfully!")
+        setFeedback("")
+      }
+
     } catch (err) {
       setMessage("❌ Failed to send feedback. Try again later.")
     }

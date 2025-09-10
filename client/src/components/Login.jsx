@@ -21,7 +21,7 @@ function Login() {
 
     const ChangeEventHandler = (e) => {
         setinput({...input, [e.target.name]: e.target.value});
-        setisExist(false);
+
     };
     async function isEmailExistHandler() {
   try {
