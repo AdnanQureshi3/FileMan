@@ -66,7 +66,7 @@ const uploadFiles = async (req, res) => {
         hasExpiry: hasExpiry === 'true',
         expiresAt: hasExpiry === 'true'
           ? new Date(Date.now() + expiresAt * 3600000)
-          : new Date(Date.now() + 10 * 24 * 3600000),
+          : new Date(Date.now() + 45 * 24 * 3600000),
         status: 'active',
         shortUrl: `/f/${shortCode}`,
         createdBy: userId,

@@ -11,6 +11,7 @@ function Signup() {
     username: ""
   });
   const navigate = useNavigate();
+  const [hide , setHide] = useState(true);
 
   const ChangeEventHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
@@ -67,17 +68,28 @@ function Signup() {
                   className="w-full border rounded-xl px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-purple-500" 
                 />
               </div>
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-                <input 
+                           <div className="relative">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Password
+                </label>
+                <input
                   id="password"
-                  name="password"   
-                  type="password" 
+                  type={hide ? "password" : "text"}
+                  name="password"
                   value={input.password}
                   onChange={ChangeEventHandler}
-                  placeholder="••••••••" 
-                  className="w-full border rounded-xl px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-purple-500" 
+                  placeholder="••••••••"
+                  className="w-full border rounded-xl px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-purple-500 pr-12"
                 />
+                <button type='button'
+                  onClick={() => setHide((prev) => !prev)}
+                  className="absolute inset-y-0 right-3 top-6 text-xl flex items-center text-gray-500 hover:text-gray-700  cursor-pointer select-none"
+                >
+                  {!hide ? "👀" : "🙈"}
+                </button>
               </div>
               
               <button 

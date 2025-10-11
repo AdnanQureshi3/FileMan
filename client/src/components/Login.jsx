@@ -13,6 +13,7 @@ function Login() {
         email: "",
         password: ""
     });
+    const [hide , setHide] = useState(true);
    
 
     const navigate = useNavigate();
@@ -88,18 +89,30 @@ function Login() {
                   className="w-full border rounded-xl px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-purple-500" 
                 />
               </div>
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-                <input 
-                  id="password" 
-                  type="password" 
-                  name='password'
-                  value={input.password}
-                  onChange={ChangeEventHandler}
-                  placeholder="••••••••" 
-                  className="w-full border rounded-xl px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-purple-500" 
-                />
-              </div>
+             <div className="relative">
+  <label
+    htmlFor="password"
+    className="block text-sm font-medium text-gray-700"
+  >
+    Password
+  </label>
+  <input
+    id="password"
+    type={hide ? "password" : "text"}
+    name="password"
+    value={input.password}
+    onChange={ChangeEventHandler}
+    placeholder="••••••••"
+    className="w-full border rounded-xl px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-purple-500 pr-12"
+  />
+  <button type='button'
+    onClick={() => setHide((prev) => !prev)}
+    className="absolute inset-y-0 right-3 top-6 text-2xl flex items-center text-gray-500 hover:text-gray-700  cursor-pointer select-none"
+  >
+    {!hide ? "👀" : "🙈"}
+  </button>
+</div>
+
               <div className='flex  justify-end text-sm text-blue-700 underline font-semibold'>
                 <p
   className="cursor-pointer"

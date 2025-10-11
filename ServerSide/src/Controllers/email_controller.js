@@ -1,5 +1,14 @@
 import nodemailer from "nodemailer";
 import User from "../models/user_Model.js";
+     const transporter = nodemailer.createTransport({ 
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
 export const sendOtpForVerification = async (req , res) => {
     try{
@@ -13,13 +22,8 @@ export const sendOtpForVerification = async (req , res) => {
         const email = savedUser.email;
         const otp = Math.floor(100000 + Math.random() * 900000);
 
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
-            },
-        });
+       
+
         console.log("email send opt send")
         
        savedUser.otp = otp.toString();
@@ -27,9 +31,9 @@ export const sendOtpForVerification = async (req , res) => {
         savedUser.otpExpiry = Date.now() + 15 * 60 * 1000; // 15 minutes expiry
         await savedUser.save();
 
-        // Send OTP email                       
-        await transporter.sendMail({
-    from: `"FileMan" <${process.env.EMAIL_USER}>`,
+        // Send OTP email   
+        const mailData={
+          from: `"FileMan" <${process.env.EMAIL_USER}>`,
     to: email,
     subject: "FileMan | Email Verification",
     html:  ` <div style="font-family: Arial, sans-serif; background-color:#f4f6f8; padding:30px;">
@@ -62,7 +66,19 @@ export const sendOtpForVerification = async (req , res) => {
         </div>
       </div>
     </div>`
-});
+
+        }                    
+        await new Promise((resolve, reject) => {
+          transporter.sendMail(mailData, (err, info) => {
+            if (err) {
+              console.error("Error sending email:", err);
+              reject(err);
+            } else {
+              console.log("Email sent:", info.response);
+              resolve(info);
+            }
+          });
+        });
 
         res.status(200).json({ message: "OTP sent successfully" , success:true });
     }
@@ -85,23 +101,15 @@ export const sendOtpForResetPassword = async (req , res) => {
         
         const otp = Math.floor(100000 + Math.random() * 900000);
 
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
-            },
-        });
+ 
         console.log("email send opt send")
         
        savedUser.otp = otp.toString();
 
         savedUser.otpExpiry = Date.now() + 15 * 60 * 1000; // 15 minutes expiry
         await savedUser.save();
-
-                  
-        await transporter.sendMail({
-    from: `"FileMan" <${process.env.EMAIL_USER}>`,
+        const mailData={
+  from: `"FileMan" <${process.env.EMAIL_USER}>`,
     to: email,
     subject: "FileMan | Email Verification",
     html: `<div style="font-family: Arial, sans-serif; background-color:#f4f6f8; padding:30px;">
@@ -134,7 +142,20 @@ export const sendOtpForResetPassword = async (req , res) => {
   </div>
 </div>
 `
-});
+        }
+
+
+await new Promise((resolve, reject) => {
+          transporter.sendMail(mailData, (err, info) => {
+            if (err) {
+              console.error("Error sending email:", err);
+              reject(err);
+            } else {
+              console.log("Email sent:", info.response);
+              resolve(info);
+            }
+          });
+        });
 
         res.status(200).json({ message: "OTP sent successfully" , success:true });
     }
@@ -154,17 +175,8 @@ export const sendFeedback = async (req , res) => {
       if (!savedUser) {
             return res.status(404).json({ message: "User not found" , success:false });
         }
-       
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
-            },
-        });
-      
-await transporter.sendMail({
-  from: `"FileMan" <${process.env.EMAIL_USER}>`,
+       const mailData={
+        from: `"FileMan" <${process.env.EMAIL_USER}>`,
   to: process.env.EMAIL_USER,
   subject: "FileMan | Feedback from Anonymous User",
   html: `<div style="font-family: Arial, sans-serif; background-color:#f4f6f8; padding:30px;">
@@ -195,7 +207,24 @@ await transporter.sendMail({
     </div>
   </div>
 </div>`
-});
+
+       }
+
+       
+await new Promise((resolve, reject) => {
+          transporter.sendMail(mailData, (err, info) => {
+            if (err) {
+              console.error("Error sending email:", err);
+              reject(err);
+            } else {
+              console.log("Email sent:", info.response);
+              resolve(info);
+            }
+          });
+        });
+   
+
+
 
         res.status(200).json({ message: "feedback sent successfully" , success:true });
     }
