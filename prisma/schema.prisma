@@ -1,7 +1,7 @@
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
+
 }
 
 datasource db {
@@ -10,8 +10,48 @@ datasource db {
 }
 
 model User {
-  email   String   @unique
-  name    String?
-  id      Int      @id @default(autoincrement())
- 
+  id              Int       @id @default(autoincrement())
+  username        String    @unique
+  email           String    @unique
+  password        String
+  fullname        String?    @default("Anonymous User")
+  files           String[]
+  total_download  Int       @default(0)
+  profile         String    @default("https://res.cloudinary.com/dxqntcbd9/image/upload/v1750397077/yeycpd77fsqme2ghuslb.jpg")
+  total_upload    Int       @default(0)
+  isPremium       Boolean   @default(false)
+  premiumExpiry   DateTime?
+  isVerified      Boolean   @default(false)
+  otp             String?
+  otpExpiry       DateTime?
+  filesizeLimit   Int       @default(10)
+  TotalSizeLimit  Int       @default(25)
+  plan            String    @default("Free")
+  UsedStorage     Int       @default(0)
+  imageCount      Int       @default(0)
+  videoCount      Int       @default(0)
+  documentCount   Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  filesUploaded   File[]
+}
+model File {
+  id                  Int       @id @default(autoincrement())
+  path                String
+  name                String
+  type                String
+  size                Int
+  downloadedContent   Int       @default(0)
+  isPasswordProtected Boolean   @default(false)
+  password            String?
+  hasExpiry           Boolean   @default(false)
+  expiresAt           DateTime?
+  status              String    @default("active")
+  shortUrl            String?
+  createdById         Int
+  createdBy           User      @relation(fields: [createdById], references: [id])
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+}
+
 }
