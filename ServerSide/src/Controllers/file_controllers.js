@@ -11,16 +11,20 @@ import path from "path";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 dotenv.config();
+import { PrismaClient } from '@prisma/client';
 
+const prisma = new PrismaClient();
 
 
 const uploadFiles = async (req, res) => {
-  console.log("uploading... in backend" , req.files);
+  console.log("uploading... in backend", req.files);
   if (!req.files || req.files.length === 0) {
-    return res.status(400).json({ error: 'No files uploaded' });
+    return res.status(400).json({ error: "No files uploaded" });
   }
 
-  const { isPassword, password, hasExpiry, expiresAt, userId } = req.body;
+  const { isPassword, password, hasExpiry, expiresAt } = req.body;
+  let userId = Number(req.body.userId);
+  
 
   try {
     const s3 = new AWS.S3({
@@ -28,23 +32,28 @@ const uploadFiles = async (req, res) => {
       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
       region: process.env.AWS_REGION,
     });
-    const user = await User.findById(userId);
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) return res.status(404).json({ error: "User not found" });
+
     let availableSpace = user.TotalSizeLimit - user.UsedStorage;
     let SpaceUsed = 0;
-
     const savedFiles = [];
-    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    
+    let totalUploads = 0, imageCountInc = 0, videoCountInc = 0, documentCountInc = 0;
 
     for (const file of req.files) {
       const originalName = file.originalname;
       const extension = path.extname(originalName);
       const uniqueSuffix = shortid.generate();
-      const finalFileName = `${originalName.replace(/\s+/g, '_')}_${uniqueSuffix}${extension}`;
+      const finalFileName = `${originalName.replace(/\s+/g, "_")}_${uniqueSuffix}${extension}`;
 
-      if(file.size/(1024*1024) > availableSpace){
-        return res.status(400).json({ error: `Insufficient storage space. You can upload files up to ${availableSpace / (1024 * 1024)} MB.` });
+      if (file.size / (1024 * 1024) > availableSpace) {
+        return res.status(400).json({
+          error: `Insufficient storage space. You can upload files up to ${availableSpace / (1024 * 1024)} MB.`,
+        });
       }
-      
 
       const params = {
         Bucket: process.env.AWS_BUCKET_NAME,
@@ -56,47 +65,58 @@ const uploadFiles = async (req, res) => {
       const s3Result = await s3.upload(params).promise();
       const fileUrl = s3Result.Location;
       const shortCode = shortid.generate();
-      
 
       const fileObj = {
         path: fileUrl,
         name: finalFileName,
         type: file.mimetype,
         size: file.size,
-        hasExpiry: hasExpiry === 'true',
-        expiresAt: hasExpiry === 'true'
-          ? new Date(Date.now() + expiresAt * 3600000)
-          : new Date(Date.now() + 45 * 24 * 3600000),
-        status: 'active',
+        hasExpiry: hasExpiry === "true",
+        expiresAt:
+          hasExpiry === "true"
+            ? new Date(Date.now() + expiresAt * 3600000)
+            : new Date(Date.now() + 45 * 24 * 3600000),
+        status: "active",
         shortUrl: `/f/${shortCode}`,
-        createdBy: userId,
+        createdById: userId,
       };
-      availableSpace -= file.size/(1024*1024);
-      SpaceUsed += file.size/(1024*1024);
 
-      if (isPassword === 'true') {
+      availableSpace -= file.size / (1024 * 1024);
+      SpaceUsed += file.size / (1024 * 1024);
+
+      if (isPassword === "true") {
         const hashedPassword = await bcrypt.hash(password, 10);
         fileObj.password = hashedPassword;
         fileObj.isPasswordProtected = true;
       }
 
-      const newFile = new File(fileObj);
-      const savedFile = await newFile.save();
+      const savedFile = await prisma.file.create({ data: fileObj });
       savedFiles.push(savedFile);
 
-      // Update user stats
-      user.total_upload += 1;
-      if (file.mimetype.startsWith('image/')) user.imageCount += 1;
-      else if (file.mimetype.startsWith('video/')) user.videoCount += 1;
-      else if (file.mimetype.startsWith('application/')) user.documentCount += 1;
+      // ✅ increment counters instead of DB update each iteration
+
+      totalUploads++;
+      if (file.mimetype.startsWith("image/")) imageCountInc++;
+      else if (file.mimetype.startsWith("video/")) videoCountInc++;
+      else if (file.mimetype.startsWith("application/")) documentCountInc++;
     }
-    
-    user.UsedStorage += SpaceUsed;
-    await user.save();
+
+    // ✅ single DB update for user stats
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        UsedStorage: { increment: SpaceUsed },
+        total_upload: { increment: totalUploads },
+        imageCount: { increment: imageCountInc },
+        videoCount: { increment: videoCountInc },
+        documentCount: { increment: documentCountInc },
+      },
+    });
 
     return res.status(201).json({
       message: "Files uploaded successfully",
-      fileIds: savedFiles.map(f => f._id),
+      
+      fileIds: savedFiles.map((f) => f.id),
     });
   } catch (error) {
     console.error("Upload error:", error);
@@ -110,7 +130,7 @@ const downloadInfo = async (req, res) => {
   const { shortCode } = req.params;
 
   try {
-    const file = await File.findOne({ shortUrl: `/f/${shortCode}` });
+    const file = await prisma.file.findUnique({ where: { shortUrl: `/f/${shortCode}` } });
     if (!file) {
       return res.status(404).json({ error: 'File not found' });
     }
@@ -139,20 +159,24 @@ const downloadInfo = async (req, res) => {
     const command = new GetObjectCommand(params);
     const downloadUrl = await getSignedUrl(s3, command, { expiresIn: 24 * 60 * 60 }); //1 day
 
-    file.downloadedContent++;
-    await file.save();
+    await prisma.file.update({
+      where: { id: file.id },
+      data: { downloadedContent: { increment: 1 } }
+    });
 
     // Update user download count
 
-    const user = await User.findById(file.createdBy);
+    const user = await prisma.user.findUnique({ where: { id: file.createdById } });
     if (user) {
-      user.totalDownloads += 1;
-      await user.save();
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { totalDownloads: { increment: 1 } }
+      });
     }
 
     return res.status(200).json({
       downloadUrl,
-      id: file._id,
+      id: file.id,
       name: file.name,
       size: file.size,
       type: file.type || 'file',
@@ -180,7 +204,7 @@ const downloadFile = async (req, res) => {
     const { fileId } = req.params;
     const { password } = req.body;
     try {
-        const file = await File.findById(fileId);
+        const file = await prisma.file.findUnique({ where: { id: Number(fileId) } });
         if (!file) {
             return res.status(404).json({ error: 'File not found' });
         }
@@ -222,14 +246,19 @@ const downloadFile = async (req, res) => {
         return res.status(500).json({ error: 'Error generating download URL' });
     }
 
-    file.downloadedContent++;
-    await file.save();
+   
+    await prisma.file.update({
+      where: { id: Number(fileId) },
+      data: { downloadedContent: { increment: 1 } }
+    });
 
     // Update user download count
-    const user = await User.findById(file.createdBy);
+    const user = await prisma.user.findUnique({ where: { id: file.createdById } });
     if (user) {
-      user.totalDownloads += 1;
-      await user.save();
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { totalDownloads: { increment: 1 } }
+      });
     }
 
     return res.status(200).json({ downloadUrl });
@@ -408,8 +437,10 @@ const searchFiles = async (req, res) => {
   const { query } = req.query; // Search query string
 
   try {
-    const files = await File.find({
-      name: { $regex: query, $options: 'i' }, // Case-insensitive search
+    const files = await prisma.file.findMany({
+      where: {
+        name: { contains: query, mode: 'insensitive' }, // Case-insensitive search
+      },
     });
 
     if (!files.length) {
@@ -428,7 +459,7 @@ const showUserFiles = async (req, res) => {
   const { userId } = req.params;
 
   try {
-    const files = await File.find({ createdBy: userId });
+    const files = await prisma.file.findMany({ where: { createdById: userId } });
 
     if (!files.length) {
       return res.status(404).json({ message: 'No files found' });
@@ -446,7 +477,7 @@ const getFileDetails = async (req, res) => {
   const { fileId } = req.params;
 
   try {
-    const file = await File.findById(fileId);
+    const file = await prisma.file.findUnique({ where: { id: Number(fileId) } });
     if (!file) {
       return res.status(404).json({ message: 'File not found' });
     }
@@ -461,12 +492,15 @@ const getFileDetails = async (req, res) => {
 const generateShareShortenLink = async (req, res) => {
   const { fileId } = req.body;
   try {
-    const file = await File.findById(fileId);
+    const file = await prisma.file.findUnique({ where: { id: Number(fileId) } });
     if (!file) return res.status(404).json({ error: 'File not found' });
 
     const shortCode = shortid.generate();
     file.shortUrl = `${process.env.BASE_URL}/f/${shortCode}`;
-    await file.save();
+    await prisma.file.update({
+      where: { id: file.id },
+      data: { shortUrl: file.shortUrl }
+    });
 
     res.status(200).json({ shortUrl: file.shortUrl });
   } catch (error) {
@@ -597,7 +631,7 @@ const verifyFilePassword = async (req, res) =>
   
 
   try {
-    const file = await File.findOne({ shortUrl:`/f/${shortCode}` });
+    const file = await prisma.file.findUnique({ where: { shortUrl: `/f/${shortCode}` } });
     if (!file || !file.isPasswordProtected)
       return res.status(400).json({ success: false, error: "File not protected or not found" });
 
@@ -614,10 +648,11 @@ const verifyFilePassword = async (req, res) =>
 
 
 const getUserFiles = async (req, res) => {
+  console.log("getting user files");
 
   const { userId } = req.params;
   try {
-    const files = await File.find({ createdBy: userId });
+    const files = await prisma.file.findMany({ where: { createdById: userId } });
 
     if (!files.length) {
       return res.status(404).json({ message: 'No files found' });
