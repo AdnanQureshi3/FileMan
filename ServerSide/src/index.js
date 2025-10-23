@@ -2,6 +2,7 @@ import app from "./app.js";
 import ConnectDB from "./DB/ConnectDB.js";
 import UserRouter from "./Routes/userRouter.js";
 import FileRouter from "./Routes/fileRouter.js";
+import newRouter from "./Routes/new.js";
 import razorpayRoutes from "./Routes/razorpay.js";
 import express from "express";
 import path from "path";
@@ -16,6 +17,7 @@ console.log(__dirname , "yes this is my directory")
 app.use('/api/user' , UserRouter);
 app.use('/api/file' , FileRouter);
 app.use("/api/razorpay", razorpayRoutes);
+app.use("/api/new", newRouter);
 
 app.use(express.static(path.join(__dirname, '/client/dist')));
 app.get(/^\/(?!api).*/, (req, res) => {
