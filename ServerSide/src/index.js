@@ -1,5 +1,5 @@
 import app from "./app.js";
-import ConnectDB from "./DB/ConnectDB.js";
+
 import UserRouter from "./Routes/userRouter.js";
 import FileRouter from "./Routes/fileRouter.js";
 import newRouter from "./Routes/new.js";
@@ -26,6 +26,6 @@ app.get(/^\/(?!api).*/, (req, res) => {
 
 app.listen(PORT, () => {
 
-    ConnectDB();
+   
     console.log(`Server is running on port ${PORT}`);
 });

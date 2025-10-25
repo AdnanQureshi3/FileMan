@@ -1,5 +1,8 @@
 import nodemailer from "nodemailer";
 import User from "../models/user_Model.js";
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
@@ -18,7 +21,7 @@ export const sendOtpForVerification = async (req , res) => {
     try{
    
       console.log("sending otp");
-        const savedUser = await User.findOne({ _id: req.id });
+        const savedUser = await prisma.user.findUnique({ where: { id: req.id } });
         if (!savedUser) {
             return res.status(404).json({ message: "User not found" , success:false });
         }
@@ -26,14 +29,14 @@ export const sendOtpForVerification = async (req , res) => {
         const email = savedUser.email;
         const otp = Math.floor(100000 + Math.random() * 900000);
 
-       
-
-        console.log("email send opt send")
-        
-       savedUser.otp = otp.toString();
-
-        savedUser.otpExpiry = Date.now() + 15 * 60 * 1000; // 15 minutes expiry
-        await savedUser.save();
+        await prisma.user.update({
+          where: { id: savedUser.id },
+          data: {
+            otp: otp.toString(),
+            otpExpiry: new Date(Date.now() + 15 * 60 * 1000) // 15 minutes expiry
+          }
+        })
+        console.log("email send opt send" , email)
 
         // Send OTP email   
         const mailData={
@@ -96,7 +99,7 @@ export const sendOtpForResetPassword = async (req , res) => {
       
       console.log("sending otp");
       const {email } = req.body;
-      const savedUser = await User.findOne({email});
+      const savedUser = await prisma.user.findUnique({ where: { email } });
       console.log(savedUser , email)
       if (!savedUser) {
             return res.status(404).json({ message: "User not found" , success:false });
@@ -111,7 +114,10 @@ export const sendOtpForResetPassword = async (req , res) => {
        savedUser.otp = otp.toString();
 
         savedUser.otpExpiry = Date.now() + 15 * 60 * 1000; // 15 minutes expiry
-        await savedUser.save();
+        await prisma.user.update({
+          where: { email },
+          data: { otp: savedUser.otp, otpExpiry: savedUser.otpExpiry }
+        });
         const mailData={
   from: `"FileMan" <${process.env.EMAIL_USER}>`,
     to: email,
@@ -174,7 +180,7 @@ export const sendFeedback = async (req , res) => {
       
       
       const {feedback } = req.body;
-       const savedUser = await User.findOne({ _id: req.id });
+       const savedUser = await prisma.user.findUnique({ where: { id: req.id } });
       console.log(savedUser , feedback)
       if (!savedUser) {
             return res.status(404).json({ message: "User not found" , success:false });

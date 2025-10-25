@@ -1,4 +1,4 @@
-import File from '../models/files_Model.js';
+
 // import s3 from "../config/s3.js";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";  
@@ -130,10 +130,11 @@ const downloadInfo = async (req, res) => {
   const { shortCode } = req.params;
 
   try {
-    const file = await prisma.file.findUnique({ where: { shortUrl: `/f/${shortCode}` } });
+    const file = await prisma.file.findFirst({ where: { shortUrl: `/f/${shortCode}` } });
     if (!file) {
       return res.status(404).json({ error: 'File not found' });
     }
+    console.log(file)
     if (file.status !== 'active') {
       return res.status(403).json({ error: 'This file is not available for download' });
     }
@@ -170,7 +171,7 @@ const downloadInfo = async (req, res) => {
     if (user) {
       await prisma.user.update({
         where: { id: user.id },
-        data: { totalDownloads: { increment: 1 } }
+        data: { total_download: { increment: 1 } }
       });
     }
 
@@ -278,18 +279,18 @@ const deleteFile = async (req, res) => {
 
   
   try {
-      const user = await User.findById(UserId);
+      const user = await prisma.user.findUnique({ where: { id: Number(UserId) } });
       if(!user){
         return res.status(404).json({error:'User not found'});
       }
-        const file=await File.findById(fileId);
+        const file=await prisma.file.findUnique({ where: { id: Number(fileId) } });
         const size = file.size;
 
         
         if(!file){
           return res.status(404).json({error:'File not found'});
         }
-        if(user._id.toString() !== file.createdBy.toString()){
+        if(user.id.toString() !== file.createdById.toString()){
           return res.status(403).json({error:'Unauthorized to delete this file'});
         }
 
@@ -309,10 +310,16 @@ const deleteFile = async (req, res) => {
         }
 
         await s3.deleteObject(params).promise();
-        
-         await File.deleteOne({ _id: fileId });
-         user.UsedStorage -= size;
-         await user.save();
+
+         await prisma.file.delete({ where: { id: fileId } });
+
+         await prisma.user.update({
+          where:{ id: UserId},
+          data:{
+            UsedStorage: { decrement: size }
+          }
+         })
+         
 
         return res.status(200).json({message:'File deleted successfully'});
      }catch(error) {
@@ -332,7 +339,7 @@ const updateFileStatus = async (req, res) => {
           return res.status(400).json({ error: 'Invalid status' });
         }
 
-        const file=await File.findById(fileId);
+        const file=await prisma.file.findUnique({ where: { id: Number(fileId )} });
 
         if(!file){
           return res.status(404).json({error:'File not found'});
@@ -342,8 +349,11 @@ const updateFileStatus = async (req, res) => {
           return res.status(400).json({error:'File already has this status'});
         }
 
-        file.status=status;
-        await file.save();
+        
+        await prisma.file.update({
+          where: { id: fileId },
+          data: { status: status }
+        });
 
         return res.status(200).json({message:'File status updated successfully'});
      }catch(error) {
@@ -357,7 +367,7 @@ const updateFileExpiry = async (req, res) => {
     const { expiresAt} = req.body;
 
     try{
-       const file=await File.findById(fileId);
+       const file=await prisma.file.findUnique({ where: { id: Number(fileId) } });
         if(!file){
             return res.status(404).json({error:'File not found'});
         }
@@ -366,7 +376,10 @@ const updateFileExpiry = async (req, res) => {
           file.expiresAt = new Date(Date.now() + expiresAt * 3600000); // Convert hours to milliseconds
         }
 
-        await file.save();
+        await prisma.file.update({
+          where: { id: fileId },
+          data: { expiresAt: file.expiresAt }
+        });
 
     return res.status(200).json({ message: 'File expiry updated successfully' });
     }catch(error) {
@@ -411,7 +424,7 @@ const updateFilePassword = async (req, res) => {
   const { newPassword } = req.body;
 
   try {
-    const file = await File.findById(fileId);
+    const file = await prisma.file.findUnique({ where: { id: Number(fileId) } });
     if (!file) {
       return res.status(404).json({ error: 'File not found' });
     }
@@ -422,7 +435,10 @@ const updateFilePassword = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     file.password = hashedPassword;
-    await file.save();
+    await prisma.file.update({
+      where: { id: Number(fileId) },
+      data: { password: hashedPassword }
+    });
 
     return res.status(200).json({ message: 'File password updated successfully' });
 
@@ -457,9 +473,10 @@ const searchFiles = async (req, res) => {
 
 const showUserFiles = async (req, res) => {
   const { userId } = req.params;
+  console.log(userId , req.params , req.query)
 
   try {
-    const files = await prisma.file.findMany({ where: { createdById: userId } });
+    const files = await prisma.file.findMany({ where: { createdById: Number(userId) } });
 
     if (!files.length) {
       return res.status(404).json({ message: 'No files found' });
@@ -562,7 +579,7 @@ const generateQR = async (req, res) => {
   const { fileId } = req.params;
 
   try {
-    const file = await File.findById(fileId);
+    const file = await prisma.file.findUnique({ where: { id: Number(fileId) } });
     if (!file) return res.status(404).json({ error: 'File not found' });
 
     const fileUrl = file.path;
@@ -580,7 +597,7 @@ const getDownloadCount = async (req, res) => {
   const { fileId } = req.params;
 
   try {
-    const file = await File.findById(fileId);
+    const file = await prisma.file.findUnique({ where: { id: Number(fileId) } });
     if (!file) return res.status(404).json({ error: 'File not found' });
     res.status(200).json({ downloadCount: file.downloadedContent });
   }
@@ -596,7 +613,7 @@ const shortUrl = `${process.env.BASE_URL}/f/${code}`;
 const file = await File.findOne({ shortUrl });
 
   try {
-    const file = await File.findOne({ shortUrl });
+    const file = await prisma.file.findFirst({ where: { shortUrl } });
 
     if (!file) {
       return res.status(404).json({ error: "Invalid or expired link" });
@@ -628,10 +645,11 @@ const file = await File.findOne({ shortUrl });
 const verifyFilePassword = async (req, res) => 
   {
   const { shortCode, password } = req.body;
+  console.log(password)
   
 
   try {
-    const file = await prisma.file.findUnique({ where: { shortUrl: `/f/${shortCode}` } });
+    const file = await prisma.file.findFirst({ where: { shortUrl: `/f/${shortCode}` } });
     if (!file || !file.isPasswordProtected)
       return res.status(400).json({ success: false, error: "File not protected or not found" });
 
@@ -652,7 +670,8 @@ const getUserFiles = async (req, res) => {
 
   const { userId } = req.params;
   try {
-    const files = await prisma.file.findMany({ where: { createdById: userId } });
+  const { userId } = (req.params);
+    const files = await prisma.file.findMany({ where: { createdById:Number( userId) } });
 
     if (!files.length) {
       return res.status(404).json({ message: 'No files found' });

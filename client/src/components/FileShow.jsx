@@ -23,8 +23,8 @@ const FileShow = () => {
   const itemsPerPage = 10;
 
   useEffect(() => {
-    if (user && user._id) {
-      dispatch(getUserFiles(user._id));
+    if (user && user.id) {
+      dispatch(getUserFiles(user.id));
     }
   }, [user, dispatch]);
 

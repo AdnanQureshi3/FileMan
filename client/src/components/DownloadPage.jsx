@@ -46,6 +46,7 @@ const DownloadPage = () => {
   }, [shortCode]);
 
   const handleDownload = () => {
+    console.log(file)
     if (!file) return;
     const link = document.createElement("a");
     link.href = file.downloadUrl;

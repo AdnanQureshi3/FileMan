@@ -12,7 +12,7 @@ function PayButton({ plan }) {
 
     const user = useSelector((state) => state.auth.user);
     const disabled = user === null || user.plan === plan.name || user.plan === "Premium Pro"; 
-    const userId = user?._id;
+    const userId = user?.id;
 
     const handlePayment = async () => {
         if (user.isVerified === false) {

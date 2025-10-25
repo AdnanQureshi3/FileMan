@@ -1,4 +1,4 @@
-import User from "../models/user_Model.js";
+
 import bcrypt from "bcryptjs"
 import jwt from 'jsonwebtoken'
 import dotenv from "dotenv";
@@ -56,7 +56,8 @@ if (!result.success) {
             data: {
                 username,
                 email,
-                password: hashedpassword
+                password: hashedpassword,
+                isVerified:true,
             }
         });
         console.log("Checking for existing user...");
@@ -247,6 +248,7 @@ export const verifyuser = async (req, res) => {
         const id = req.id;
         // console.log("Verifying user with OTP:", otp, "for user ID:", id);
         const user = await prisma.user.findUnique({ where: { id } });
+        console.log("Verifying user with OTP:", otp, "for user ID:", user.id);
         if(user.otpExpiry < Date.now()){
             return res.status(401).json({
                 message: "OTP expired.",
@@ -285,7 +287,6 @@ export const verifyOTPForPasswordreset = async (req, res) => {
     try {
         const {otp , email} = req.body;
      
-        console.log("Verifying user with OTP:", otp, "for user ID:", email);
         const user = await prisma.user.findUnique({ where: { email } });
         if(user.otpExpiry < Date.now()){
             return res.status(401).json({
@@ -293,6 +294,7 @@ export const verifyOTPForPasswordreset = async (req, res) => {
                 success: false
             });
         }
+        
 
         if(user.otp != otp ){
             return res.status(401).json({
