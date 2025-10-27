@@ -12,7 +12,7 @@ function Header({ setActiveTab }) {
     <>
      <header className="hidden sm:flex fixed top-0 left-0 w-full px-6 py-3 bg-white dark:bg-gray-800 shadow-md z-50 items-center justify-between text-black dark:text-white">
   <Link to="/" className="flex items-center space-x-2">
-    <img src='/logo.png' alt="Logo" className="w-10 h-10 rounded-full" />
+    <img src='/logo.png' alt="Logo" className="w-12 h-12 rounded-full" />
     <span className="text-2xl font-bold text-black dark:text-white">FileMan</span>
   </Link>
 

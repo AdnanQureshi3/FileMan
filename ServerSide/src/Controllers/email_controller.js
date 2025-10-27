@@ -107,16 +107,16 @@ export const sendOtpForResetPassword = async (req , res) => {
        
         
         const otp = Math.floor(100000 + Math.random() * 900000);
+        const expiryTimestamp = Date.now() + 15 * 60 * 1000;
+        const otpExpiryDate = new Date(expiryTimestamp);
 
- 
-        console.log("email send opt send")
+        console.log("email send opt send");
+
+
         
-       savedUser.otp = otp.toString();
-
-        savedUser.otpExpiry = Date.now() + 15 * 60 * 1000; // 15 minutes expiry
         await prisma.user.update({
           where: { email },
-          data: { otp: savedUser.otp, otpExpiry: savedUser.otpExpiry }
+          data: { otp: otp.toString(), otpExpiry: otpExpiryDate }
         });
         const mailData={
   from: `"FileMan" <${process.env.EMAIL_USER}>`,

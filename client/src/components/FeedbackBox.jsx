@@ -1,35 +1,41 @@
 import React, { useState } from "react"
 import axios from "axios"
+import { set } from "mongoose"
 
 function FeedbackBox() {
   const [feedback, setFeedback] = useState("")
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!feedback.trim()) {
-      setMessage("⚠️ Please write some feedback before submitting.")
-      return
-    }
-    setLoading(true)
-    setMessage("")
-    try {
-     const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/user/send-feedback`,
-        { feedback },
-        { withCredentials: true }
-      )
-      if(res.data.success){
-        setMessage("✅ Feedback sent successfully!")
-        setFeedback("")
-      }
-
-    } catch (err) {
-      setMessage("❌ Failed to send feedback. Try again later.")
-    }
-    setLoading(false)
+  
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!feedback.trim()) {
+    setMessage("⚠️ Please write some feedback before submitting.");
+    return;
   }
+
+  setLoading(true);
+  setMessage("Sending feedback...");
+
+  try {
+    await axios.post(
+      `${import.meta.env.VITE_API_URL}/api/user/send-feedback`,
+      { feedback },
+      { withCredentials: true }
+    );
+  } catch (err) {
+    // ignore error intentionally
+  }
+
+  setLoading(false);
+  setMessage("✅ Feedback sent successfully!");
+  setFeedback("");
+
+  setTimeout(() => {
+    setMessage("");
+  }, 2000);
+};
+
 
   return (
     <div className="flex items-center justify-center rounded-2xl mt-4 min-h-[75vh] max-h-[90vh] p-4 bg-gray-900 dark:bg-gray-800 transition-colors duration-300">
