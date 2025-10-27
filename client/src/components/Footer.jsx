@@ -46,7 +46,7 @@ function Footer({setActiveTab}) {
       </footer>
 
       {/* Mobile Bottom Nav */}
-      <div className="sm:hidden z-50 fixed bottom-0 left-0 w-full bg-[var(--bg-color)] text-[var(--text-color)] shadow-t z-50 flex justify-around items-center py-2">
+      <div className="sm:hidden z-50 fixed bottom-0 left-0 w-full bg-[var(--bg-color)] text-[var(--text-color)] shadow- flex justify-around items-center py-2">
         <div onClick={() => ActiveTabHandler("home")} className="flex flex-col items-center cursor-pointer">
           🏠 <span className="text-xs">Home</span>
         </div>
