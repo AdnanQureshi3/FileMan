@@ -193,11 +193,9 @@ export const purchasePremium = async ({ paymentDetails }) => {
 
     try {
         const user = await prisma.user.findUnique({ where: { id: userId } });
-        
         if (!user) {
             return { success: false, message: "User not found." };
         }
-        
         if (user.isVerified === false) {
             return { success: false, message: "Please verify your email to purchase premium." };
         }
@@ -242,6 +240,7 @@ export const logout = async (req, res) => {
         console.log(err);
     }
 };
+
 export const verifyuser = async (req, res) => {
     try {
         const {otp} = req.body;

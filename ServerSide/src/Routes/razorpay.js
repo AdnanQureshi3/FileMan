@@ -1,7 +1,9 @@
 import express from "express";
 import crypto from "crypto";
 import razorpay from '../config/razorpay.js';
-import User from "../models/user_Model.js";
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 import { purchasePremium } from "../Controllers/user_controller.js";
 
 const router = express.Router();
@@ -38,7 +40,7 @@ router.post("/verify-payment", async (req, res) => {
 
   const result = await purchasePremium({ paymentDetails });
   console.log("Purchase result:", result);
-    const user = await User.findById(paymentDetails.userId).select("-password");
+    const user = await prisma.user.findUnique({ where: { id: paymentDetails.userId } });
     console.log("Payment verified and premium activated for user:", user);
   
     

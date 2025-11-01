@@ -6,7 +6,6 @@ import AWS from "aws-sdk";
 import nodemailer from "nodemailer";
 import shortid from "shortid";
 import QRCode from "qrcode";
-import User from "../models/user_Model.js";
 import path from "path";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
