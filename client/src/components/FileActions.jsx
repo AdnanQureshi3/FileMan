@@ -47,7 +47,9 @@ export default function FileActions({ file, setPreviewFile, setShareFile }) {
   try {
     console.log("Fetching preview for file:", file.id);
     const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/file/preview/${file.id}`);
-    setPreviewFile(res.data.previewUrl);
+    // setPreviewFile(res.data.previewUrl);
+    setPreviewFile({ ...file, url: res.data.previewUrl });
+
     setOpen(false);
   } catch (err) {
     console.error(err);
