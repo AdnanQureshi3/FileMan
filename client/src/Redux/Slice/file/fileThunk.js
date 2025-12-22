@@ -32,7 +32,7 @@ export const getFileDetails = createAsyncThunk("file/getDetails", async (fileId,
 // DELETE FILE
 export const deleteFile = createAsyncThunk("file/delete", async (fileId, { rejectWithValue }) => {
   try {
-    console.log("Deleting file...");
+    console.log("Deleting file... " , {fileId });
     await axiosInstance.delete(`/file/delete/${fileId}`);
     return fileId;
   } catch (err) {

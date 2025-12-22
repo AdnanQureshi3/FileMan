@@ -1,13 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+
 const PreviewModal = ({ file, onClose }) => {
   if (!file) return null;
 
-  // ✅ Use URL.createObjectURL only if it’s a real File object
-  
   const previewUrl =
-    file instanceof File
-      ? URL.createObjectURL(file)
-      : file.url || file.path || ""; // fallback for API/DB stored files
+    file instanceof File ? URL.createObjectURL(file) : file.url;
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
@@ -21,12 +18,14 @@ const PreviewModal = ({ file, onClose }) => {
 
         <div className="flex-1 overflow-hidden">
           {file.type === "application/pdf" ? (
-            <iframe src={previewUrl} title="PDF Preview" className="w-full h-full border-0" />
+            <iframe src={previewUrl} className="w-full h-full border-0" />
           ) : file.type?.startsWith("image/") ? (
-            <img src={previewUrl} alt={file.name} className="w-full h-full object-contain" />
+            <img src={previewUrl} className="w-full h-full object-contain" />
+          ) : file.type?.startsWith("video/") ? (
+            <video src={previewUrl} controls className="w-full h-full" />
           ) : (
             <div className="flex items-center justify-center h-full text-gray-700">
-              <p>{file.name || "Unsupported file"}</p>
+              Unsupported file
             </div>
           )}
         </div>
@@ -34,4 +33,5 @@ const PreviewModal = ({ file, onClose }) => {
     </div>
   );
 };
+
 export default PreviewModal;

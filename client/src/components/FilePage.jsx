@@ -74,7 +74,7 @@ const FilePage = () => {
       const isExpired = new Date(file.expiresAt) <= new Date();
       return (
         <div
-          key={file._id}
+          key={file.id}
           className="bg-white dark:bg-gray-700 rounded-2xl shadow-md dark:shadow-gray-600 p-4 flex flex-col gap-3 border border-gray-200 dark:border-gray-600 transition-colors"
         >
           <div className="flex items-center justify-between">

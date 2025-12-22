@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { MdMoreVert, MdDelete, MdRemoveRedEye, MdOutlineShare } from "react-icons/md";
 import { useDispatch } from "react-redux";
 import { deleteFile } from "../Redux/Slice/file/fileThunk";
+import axios from "axios";
 
 export default function FileActions({ file, setPreviewFile, setShareFile }) {
   const [open, setOpen] = useState(false);
@@ -38,14 +39,20 @@ export default function FileActions({ file, setPreviewFile, setShareFile }) {
   };
 
   const handleDelete = () => {
-    dispatch(deleteFile(file._id));
+    dispatch(deleteFile(file.id));
     setOpen(false);
   };
 
-  const handlePreview = () => {
-    setPreviewFile(file);
+  const handlePreview = async () => {
+  try {
+    console.log("Fetching preview for file:", file.id);
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/file/preview/${file.id}`);
+    setPreviewFile(res.data.previewUrl);
     setOpen(false);
-  };
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   const handleShare = () => {
     setShareFile(file);

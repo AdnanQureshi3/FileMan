@@ -56,7 +56,7 @@ const FileTable = ({
                   : `${file.size} Bytes`;
 
                 return (
-                  <tr key={file._id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+                  <tr key={file.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
                     <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-100 truncate max-w-[120px] sm:max-w-none">
                       {formatFileName(file.name)}
                     </td>

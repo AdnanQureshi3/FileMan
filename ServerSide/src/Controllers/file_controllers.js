@@ -1,13 +1,12 @@
 
-// import s3 from "../config/s3.js";
+import s3 from "../config/s3.js";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";  
-import AWS from "aws-sdk";
 import nodemailer from "nodemailer";
 import shortid from "shortid";
 import QRCode from "qrcode";
 import path from "path";
-import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+import {  GetObjectCommand  , PutObjectCommand , DeleteObjectCommand} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 dotenv.config();
 import { PrismaClient } from '@prisma/client';
@@ -26,11 +25,7 @@ const uploadFiles = async (req, res) => {
   
 
   try {
-    const s3 = new AWS.S3({
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-      region: process.env.AWS_REGION,
-    });
+ 
 
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) return res.status(404).json({ error: "User not found" });
@@ -54,19 +49,21 @@ const uploadFiles = async (req, res) => {
         });
       }
 
-      const params = {
-        Bucket: process.env.AWS_BUCKET_NAME,
-        Key: `file-share-app/${finalFileName}`,
-        Body: file.buffer,
-        ContentType: file.mimetype,
-      };
+      
+      const key = `file-share-app/${finalFileName}`;
 
-      const s3Result = await s3.upload(params).promise();
-      const fileUrl = s3Result.Location;
+        await s3.send(
+          new PutObjectCommand({
+            Bucket: process.env.AWS_BUCKET_NAME,
+            Key: key,
+            Body: file.buffer,
+            ContentType: file.mimetype,
+          })
+        );
       const shortCode = shortid.generate();
 
       const fileObj = {
-        path: fileUrl,
+        path: key,
         name: finalFileName,
         type: file.mimetype,
         size: file.size,
@@ -127,6 +124,7 @@ const uploadFiles = async (req, res) => {
 
 const downloadInfo = async (req, res) => {
   const { shortCode } = req.params;
+  console.log("Download info request for code:", shortCode);
 
   try {
     const file = await prisma.file.findFirst({ where: { shortUrl: `/f/${shortCode}` } });
@@ -142,21 +140,13 @@ const downloadInfo = async (req, res) => {
       return res.status(410).json({ error: 'This file has expired' });
     }
 
-    const s3 = new S3Client({
-      region: process.env.AWS_REGION,
-      credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
-      }
-    });
+    const key = file.path;
 
-    const params = {
+    const command = new GetObjectCommand({
       Bucket: process.env.AWS_BUCKET_NAME,
-      Key: `file-share-app/${file.name}`,
+      Key: key,
       ResponseContentDisposition: `attachment; filename="${file.name}"`
-    };
-
-    const command = new GetObjectCommand(params);
+    });
     const downloadUrl = await getSignedUrl(s3, command, { expiresIn: 24 * 60 * 60 }); //1 day
 
     await prisma.file.update({
@@ -228,20 +218,16 @@ const downloadFile = async (req, res) => {
       }
     }
 
-    const s3 = new AWS.S3({
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-      region: process.env.AWS_REGION
-    });
 
-    const key = `file-share-app/${file.name}`;
-    const params = {
-      Bucket: process.env.AWS_BUCKET_NAME,
-      Key: key,
-      Expires: 24 * 60 * 60,
-    };
+    const key = file.path;
+    const command = new GetObjectCommand({
+      Bucket:process.env.AWS_BUCKET_NAME,
+      Key:key,
+      ResponseContentDisposition: `attachment; filename="${file.name}"`
+    })
+    
 
-    const downloadUrl = s3.getSignedUrl('getObject', params);
+    const downloadUrl = await getSignedUrl(s3, command, { expiresIn: 24 * 60 * 60 });
     if (!downloadUrl) {
         return res.status(500).json({ error: 'Error generating download URL' });
     }
@@ -274,7 +260,7 @@ const downloadFile = async (req, res) => {
 const deleteFile = async (req, res) => {
   const { fileId } = req.params;
   const UserId = req.id;
-  console.log("Delete request received" , UserId);
+  console.log("Delete request received" , UserId , fileId);
 
   
   try {
@@ -296,21 +282,15 @@ const deleteFile = async (req, res) => {
         if(file.status==='deleted'){
           return res.status(400).json({error:'File already deleted'});
         }
-
-        const s3 =new AWS.S3({
-          accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-          region: process.env.AWS_REGION
-        })
-
-        const params={
+        const key = file.path;
+        const command = new DeleteObjectCommand({
           Bucket: process.env.AWS_BUCKET_NAME,
-          Key: `file-share-app/${file.name}`
-        }
+          Key: key
+        })
+        
+          await s3.send(command);
 
-        await s3.deleteObject(params).promise();
-
-         await prisma.file.delete({ where: { id: fileId } });
+         await prisma.file.delete({ where: { id: Number(fileId) } });
 
          await prisma.user.update({
           where:{ id: UserId},
@@ -663,6 +643,26 @@ const verifyFilePassword = async (req, res) =>
 };
 
 
+const previewFile = async (req, res) => {
+  console.log("Previewing file:", req.params.fileId);
+  const id = req.params.fileId;
+
+
+  const file = await prisma.file.findUnique({ where: { id: Number(id) } });
+  if (!file) return res.status(404).json({ error: "File not found" });
+
+  const command = new GetObjectCommand({
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Key: file.path,
+    ResponseContentDisposition: `inline`,
+  });
+
+  const previewUrl = await getSignedUrl(s3, command, {
+    expiresIn: 300,
+  });
+
+  res.json({ previewUrl });
+};
 
 const getUserFiles = async (req, res) => {
   console.log("getting user files");
@@ -705,5 +705,6 @@ export {
     getUserFiles,
     updateAllFileExpiry,
     downloadInfo,
+    previewFile
     
 };

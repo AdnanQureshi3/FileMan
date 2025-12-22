@@ -5,7 +5,7 @@ import { setAuthUser } from "../Redux/Slice/auth.js"
 import OtpVerification from "./VerifyPage";
 
 
-function PayButton({ plan }) {
+function PayButton({ plan }){
     const dispatch = useDispatch();
     const [showVerify, setShowVerify] = useState(false);
     const [Open , setOpen] = useState(false);
@@ -44,6 +44,7 @@ function PayButton({ plan }) {
                 order_id: data.orderId,
                 handler: async function (response) {
                     try {
+                      
                         const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/razorpay/verify-payment`, {
                             ...response,
                             paymentDetails
