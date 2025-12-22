@@ -631,6 +631,11 @@ const verifyFilePassword = async (req, res) =>
     const file = await prisma.file.findFirst({ where: { shortUrl: `/f/${shortCode}` } });
     if (!file || !file.isPasswordProtected)
       return res.status(400).json({ success: false, error: "File not protected or not found" });
+    // console.log("input:", password);
+    const hashed = await bcrypt.hash(password, 10);
+    console.log("input:", hashed);
+console.log("hash:", file.password);
+
 
     const isMatch = await bcrypt.compare(password, file.password);
     if (!isMatch) return res.status(401).json({ success: false, error: "Incorrect password" });
