@@ -15,115 +15,6 @@ import { get } from "http";
 const prisma = new PrismaClient();
 
 
-// const uploadFiles = async (req, res) => {
-//   const metadata = req.body;
-//   console.log("uploading... in backend", req.body , req.id);
-  
-//   if (!metadata || metadata.files.length === 0) {
-//     return res.status(400).json({ error: "No files uploaded" });
-//   }
-
-//   const { isPassword, password, hasExpiry, expiresAt } = req.body;
-//   let userId = Number(req.id);
-  
-
-//   try {
- 
-
-//     const user = await prisma.user.findUnique({ where: { id: userId } });
-//     if (!user) return res.status(404).json({ error: "User not found" });
-
-//     let availableSpace = user.TotalSizeLimit - user.UsedStorage;
-//     let SpaceUsed = 0;
-//     const savedFiles = [];
-
-    
-//     let totalUploads = 0, imageCountInc = 0, videoCountInc = 0, documentCountInc = 0;
-
-//     for (const file of metadata) {
-//        const sizeMB = file.size / (1024 * 1024);
-//       if (sizeMB > availableSpace) {
-//         return res.status(400).json({
-//           error: `Insufficient storage. Remaining ${availableSpace.toFixed(2)} MB`,
-//         });
-//       }
-//        const folder = getFolder(file.type);
-//       const ext = path.extname(file.name);
-//       const unique = shortid.generate();
-//       const cleanName = file.name.replace(/\s+/g, "_");
-//       const key = `${folder}/${cleanName}_${unique}${ext}`;
-
-// const uploadUrl = await getSignedUrl(
-//         s3,
-//         new PutObjectCommand({
-//           Bucket: process.env.AWS_BUCKET_NAME,
-//           Key: key,
-//           ContentType: file.type,
-//         }),
-//         { expiresIn: 120 }
-//       );
-
-//       const shortCode = shortid.generate();
-
-//       const fileObj = {
-//         path: key,
-//         name: finalFileName,
-//         type: file.mimetype,
-//         size: file.size,
-//         hasExpiry: hasExpiry === "true",
-//         expiresAt:
-//           hasExpiry === "true"
-//             ? new Date(Date.now() + expiresAt * 3600000)
-//             : new Date(Date.now() + 45 * 24 * 3600000),
-//         status: "active",
-//         shortUrl: `/f/${shortCode}`,
-//         createdById: userId,
-//       };
-
-//       availableSpace -= file.size / (1024 * 1024);
-//       SpaceUsed += file.size / (1024 * 1024);
-
-//       if (isPassword === "true") {
-//         const hashedPassword = await bcrypt.hash(password, 10);
-//         fileObj.password = hashedPassword;
-//         fileObj.isPasswordProtected = true;
-//       }
-
-//       const savedFile = await prisma.file.create({ data: fileObj });
-//       savedFiles.push(savedFile);
-
-//       // ✅ increment counters instead of DB update each iteration
-
-//       totalUploads++;
-//       if (file.mimetype.startsWith("image/")) imageCountInc++;
-//       else if (file.mimetype.startsWith("video/")) videoCountInc++;
-//       else if (file.mimetype.startsWith("application/")) documentCountInc++;
-//     }
-
-//     // ✅ single DB update for user stats
-//     await prisma.user.update({
-//       where: { id: userId },
-//       data: {
-//         UsedStorage: { increment: SpaceUsed },
-//         total_upload: { increment: totalUploads },
-//         imageCount: { increment: imageCountInc },
-//         videoCount: { increment: videoCountInc },
-//         documentCount: { increment: documentCountInc },
-//       },
-//     });
-
-//     return res.status(201).json({
-//       message: "Files uploaded successfully",
-      
-//       fileIds: savedFiles.map((f) => f.id),
-//     });
-//   } catch (error) {
-//     console.error("Upload error:", error);
-//     res.status(500).json({ message: "File upload failed" });
-//   }
-// };
-
-
 const getFolder = (mime) => {
   if (mime.startsWith("image/")) return "images";
   if (mime.startsWith("video/")) return "videos";
@@ -792,7 +683,7 @@ const getUserFiles = async (req, res) => {
 
 
 export {
-    uploadFiles,
+  
     presignFiles,
     downloadFile,
     deleteFile,

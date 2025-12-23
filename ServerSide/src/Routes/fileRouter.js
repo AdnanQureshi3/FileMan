@@ -3,7 +3,7 @@ import isAuthanticated from "../middlewares/Auth.js";
 import { deleteFile, downloadInfo, downloadFile, generateQR,
      generateShareShortenLink, getDownloadCount, getFileDetails, 
      getUserFiles, resolveShareLink, searchFiles, sendLinkEmail, showUserFiles, 
-     updateAllFileExpiry, updateFileExpiry, updateFilePassword, updateFileStatus, uploadFiles, 
+     updateAllFileExpiry, updateFileExpiry, updateFilePassword, updateFileStatus, 
      verifyFilePassword, previewFile,  confirmUploads ,
      presignFiles} from '../Controllers/file_controllers.js';
 
