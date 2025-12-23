@@ -1,16 +1,17 @@
 import { Router } from "express"
-import upload from "../middlewares/Multer.js";
 import isAuthanticated from "../middlewares/Auth.js";
 import { deleteFile, downloadInfo, downloadFile, generateQR,
      generateShareShortenLink, getDownloadCount, getFileDetails, 
      getUserFiles, resolveShareLink, searchFiles, sendLinkEmail, showUserFiles, 
      updateAllFileExpiry, updateFileExpiry, updateFilePassword, updateFileStatus, uploadFiles, 
-     verifyFilePassword, previewFile  } from '../Controllers/file_controllers.js';
+     verifyFilePassword, previewFile,  confirmUploads ,
+     presignFiles} from '../Controllers/file_controllers.js';
 
 
 const router=Router();
 
-router.post("/upload", upload.array('files'), uploadFiles);
+router.post("/upload", isAuthanticated, presignFiles);
+router.post("/confirm", isAuthanticated, confirmUploads);
 
 router.get("/download/:fileId",downloadFile);
 router.delete("/delete/:fileId", isAuthanticated, deleteFile);

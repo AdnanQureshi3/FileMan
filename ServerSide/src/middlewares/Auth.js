@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const isAuthanticated = async(req , res, next) =>{
+    console.log("isAuthanticated middleware invoked");
     try{
         const token = req.cookies.token;
         

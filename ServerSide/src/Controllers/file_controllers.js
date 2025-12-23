@@ -6,118 +6,218 @@ import nodemailer from "nodemailer";
 import shortid from "shortid";
 import QRCode from "qrcode";
 import path from "path";
-import {  GetObjectCommand  , PutObjectCommand , DeleteObjectCommand} from "@aws-sdk/client-s3";
+import {  GetObjectCommand  , PutObjectCommand , DeleteObjectCommand , HeadObjectCommand} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 dotenv.config();
 import { PrismaClient } from '@prisma/client';
+import { get } from "http";
 
 const prisma = new PrismaClient();
 
 
-const uploadFiles = async (req, res) => {
-  console.log("uploading... in backend", req.files);
-  if (!req.files || req.files.length === 0) {
-    return res.status(400).json({ error: "No files uploaded" });
-  }
+// const uploadFiles = async (req, res) => {
+//   const metadata = req.body;
+//   console.log("uploading... in backend", req.body , req.id);
+  
+//   if (!metadata || metadata.files.length === 0) {
+//     return res.status(400).json({ error: "No files uploaded" });
+//   }
 
-  const { isPassword, password, hasExpiry, expiresAt } = req.body;
-  let userId = Number(req.body.userId);
+//   const { isPassword, password, hasExpiry, expiresAt } = req.body;
+//   let userId = Number(req.id);
   
 
-  try {
+//   try {
  
 
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    if (!user) return res.status(404).json({ error: "User not found" });
+//     const user = await prisma.user.findUnique({ where: { id: userId } });
+//     if (!user) return res.status(404).json({ error: "User not found" });
 
-    let availableSpace = user.TotalSizeLimit - user.UsedStorage;
-    let SpaceUsed = 0;
-    const savedFiles = [];
+//     let availableSpace = user.TotalSizeLimit - user.UsedStorage;
+//     let SpaceUsed = 0;
+//     const savedFiles = [];
 
     
-    let totalUploads = 0, imageCountInc = 0, videoCountInc = 0, documentCountInc = 0;
+//     let totalUploads = 0, imageCountInc = 0, videoCountInc = 0, documentCountInc = 0;
 
-    for (const file of req.files) {
-      const originalName = file.originalname;
-      const extension = path.extname(originalName);
-      const uniqueSuffix = shortid.generate();
-      const finalFileName = `${originalName.replace(/\s+/g, "_")}_${uniqueSuffix}${extension}`;
+//     for (const file of metadata) {
+//        const sizeMB = file.size / (1024 * 1024);
+//       if (sizeMB > availableSpace) {
+//         return res.status(400).json({
+//           error: `Insufficient storage. Remaining ${availableSpace.toFixed(2)} MB`,
+//         });
+//       }
+//        const folder = getFolder(file.type);
+//       const ext = path.extname(file.name);
+//       const unique = shortid.generate();
+//       const cleanName = file.name.replace(/\s+/g, "_");
+//       const key = `${folder}/${cleanName}_${unique}${ext}`;
 
-      if (file.size / (1024 * 1024) > availableSpace) {
-        return res.status(400).json({
-          error: `Insufficient storage space. You can upload files up to ${availableSpace / (1024 * 1024)} MB.`,
-        });
-      }
+// const uploadUrl = await getSignedUrl(
+//         s3,
+//         new PutObjectCommand({
+//           Bucket: process.env.AWS_BUCKET_NAME,
+//           Key: key,
+//           ContentType: file.type,
+//         }),
+//         { expiresIn: 120 }
+//       );
 
+//       const shortCode = shortid.generate();
+
+//       const fileObj = {
+//         path: key,
+//         name: finalFileName,
+//         type: file.mimetype,
+//         size: file.size,
+//         hasExpiry: hasExpiry === "true",
+//         expiresAt:
+//           hasExpiry === "true"
+//             ? new Date(Date.now() + expiresAt * 3600000)
+//             : new Date(Date.now() + 45 * 24 * 3600000),
+//         status: "active",
+//         shortUrl: `/f/${shortCode}`,
+//         createdById: userId,
+//       };
+
+//       availableSpace -= file.size / (1024 * 1024);
+//       SpaceUsed += file.size / (1024 * 1024);
+
+//       if (isPassword === "true") {
+//         const hashedPassword = await bcrypt.hash(password, 10);
+//         fileObj.password = hashedPassword;
+//         fileObj.isPasswordProtected = true;
+//       }
+
+//       const savedFile = await prisma.file.create({ data: fileObj });
+//       savedFiles.push(savedFile);
+
+//       // ✅ increment counters instead of DB update each iteration
+
+//       totalUploads++;
+//       if (file.mimetype.startsWith("image/")) imageCountInc++;
+//       else if (file.mimetype.startsWith("video/")) videoCountInc++;
+//       else if (file.mimetype.startsWith("application/")) documentCountInc++;
+//     }
+
+//     // ✅ single DB update for user stats
+//     await prisma.user.update({
+//       where: { id: userId },
+//       data: {
+//         UsedStorage: { increment: SpaceUsed },
+//         total_upload: { increment: totalUploads },
+//         imageCount: { increment: imageCountInc },
+//         videoCount: { increment: videoCountInc },
+//         documentCount: { increment: documentCountInc },
+//       },
+//     });
+
+//     return res.status(201).json({
+//       message: "Files uploaded successfully",
       
-      const key = `file-share-app/${finalFileName}`;
+//       fileIds: savedFiles.map((f) => f.id),
+//     });
+//   } catch (error) {
+//     console.error("Upload error:", error);
+//     res.status(500).json({ message: "File upload failed" });
+//   }
+// };
 
-        await s3.send(
-          new PutObjectCommand({
-            Bucket: process.env.AWS_BUCKET_NAME,
-            Key: key,
-            Body: file.buffer,
-            ContentType: file.mimetype,
-          })
-        );
-      const shortCode = shortid.generate();
 
-      const fileObj = {
-        path: key,
-        name: finalFileName,
-        type: file.mimetype,
-        size: file.size,
-        hasExpiry: hasExpiry === "true",
-        expiresAt:
-          hasExpiry === "true"
-            ? new Date(Date.now() + expiresAt * 3600000)
-            : new Date(Date.now() + 45 * 24 * 3600000),
-        status: "active",
-        shortUrl: `/f/${shortCode}`,
-        createdById: userId,
-      };
+const getFolder = (mime) => {
+  if (mime.startsWith("image/")) return "images";
+  if (mime.startsWith("video/")) return "videos";
+  if (mime === "application/pdf") return "pdfs";
+  return "others";
+};
 
-      availableSpace -= file.size / (1024 * 1024);
-      SpaceUsed += file.size / (1024 * 1024);
+ const presignFiles = async (req, res) => {
+  const { metadata } = req.body;
+  const userId = Number(req.id);
+  console.log("Presign request received", metadata );
 
-      if (isPassword === "true") {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        fileObj.password = hashedPassword;
-        fileObj.isPasswordProtected = true;
-      }
+  if (!metadata || metadata.length === 0)
+    return res.status(400).json({ error: "No metadata" });
 
-      const savedFile = await prisma.file.create({ data: fileObj });
-      savedFiles.push(savedFile);
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) return res.status(404).json({ error: "User not found" });
 
-      // ✅ increment counters instead of DB update each iteration
+  let remaining = user.TotalSizeLimit - user.UsedStorage;
+  const uploads = [];
 
-      totalUploads++;
-      if (file.mimetype.startsWith("image/")) imageCountInc++;
-      else if (file.mimetype.startsWith("video/")) videoCountInc++;
-      else if (file.mimetype.startsWith("application/")) documentCountInc++;
-    }
+  for (const file of metadata) {
+    const sizeMB = file.size / (1024 * 1024);
+    if (sizeMB > remaining)
+      return res.status(400).json({ error: "Insufficient storage" });
 
-    // ✅ single DB update for user stats
-    await prisma.user.update({
-      where: { id: userId },
+    const folder = getFolder(file.type);
+    const ext = path.extname(file.name);
+    const key = `file-share-app/${folder}/${file.name.replace(/\s+/g, "_")}_${shortid.generate()}${ext}`;
+
+    const uploadUrl = await getSignedUrl(
+      s3,
+      new PutObjectCommand({
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: key,
+        ContentType: file.type,
+      }),
+      { expiresIn: 120 }
+    );
+    console.log(uploadUrl , "presigned url");
+
+    uploads.push({ key, uploadUrl, contentType: file.type });
+    remaining -= sizeMB;
+  }
+
+  res.json({ uploads });
+};
+
+
+ const confirmUploads = async (req, res) => {
+  console.log("Confirm uploads request received", req.body);
+  const { files } = req.body;
+  const userId = Number(req.id);
+
+  if (!files || files.length === 0) {
+    return res.status(400).json({ error: "No files to confirm" });
+  }
+
+  let spaceUsed = 0;
+
+  for (const file of files) {
+    // 1️⃣ Verify file really exists in S3
+    await s3.send(
+      new HeadObjectCommand({
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: file.key,
+      })
+    );
+
+    // 2️⃣ Insert DB record
+    await prisma.file.create({
       data: {
-        UsedStorage: { increment: SpaceUsed },
-        total_upload: { increment: totalUploads },
-        imageCount: { increment: imageCountInc },
-        videoCount: { increment: videoCountInc },
-        documentCount: { increment: documentCountInc },
+        path: file.key,
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        createdById: userId,
+        status: "active",
       },
     });
 
-    return res.status(201).json({
-      message: "Files uploaded successfully",
-      
-      fileIds: savedFiles.map((f) => f.id),
-    });
-  } catch (error) {
-    console.error("Upload error:", error);
-    res.status(500).json({ message: "File upload failed" });
+    spaceUsed += file.size / (1024 * 1024);
   }
+
+  // 3️⃣ Update user storage
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      UsedStorage: { increment: spaceUsed },
+      total_upload: { increment: files.length },
+    },
+  });
+
+  res.json({ message: "Files confirmed" });
 };
 
 
@@ -693,6 +793,7 @@ const getUserFiles = async (req, res) => {
 
 export {
     uploadFiles,
+    presignFiles,
     downloadFile,
     deleteFile,
     updateFileStatus,
@@ -710,6 +811,8 @@ export {
     getUserFiles,
     updateAllFileExpiry,
     downloadInfo,
-    previewFile
+    previewFile,
+    confirmUploads
+
     
 };
