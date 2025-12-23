@@ -4,12 +4,13 @@ import { uploadFile } from '../Redux/Slice/file/fileThunk.js'
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { MdCloudUpload, MdInfoOutline, MdDeleteForever } from "react-icons/md";
+import {  uploadFiles } from "../Hooks/usePresignedurls.js";
 
 const FileUploader = ({ setActiveTab }) => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
   const dispatch = useDispatch();
-  const { loading } = useSelector((state) => state.file);
+  const loading = false;
   const { user } = useSelector((state) => state.auth);
 
   const [files, setFiles] = useState([]);
@@ -88,7 +89,8 @@ const FileUploader = ({ setActiveTab }) => {
 
   const totalSize = files.reduce((acc, file) => acc + file.size, 0);
 
-  const handleUpload = async () => {
+const handleUpload = async () => {
+  console.log("Starting upload for files:", files);
     if (files.length === 0) {
       toast.error("Please upload at least one file.");
       return;
@@ -112,11 +114,34 @@ const FileUploader = ({ setActiveTab }) => {
     }
 
     try {
-      await dispatch(uploadFile(formData)).unwrap();
-      console.log("Uploaded");
-      toast.success("Files uploaded successfully!");
+      const results = await uploadFiles(files);
+
+
+    const successful = results
+      .filter(r => r.status === "success")
+      .map(r => ({
+        key: r.key,
+        name: r.file.name,
+        type: r.contentType,
+        size: r.file.size,
+      }));
+      if (successful.length > 0) {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/file/confirm`, { files: successful });
+    }
+
+   
+    const failed = results.length - successful.length;
+
+    if (failed > 0) {
+      toast.warn(
+        `${successful.length} uploaded, ${failed} failed. Retry failed files.`
+      );
+    } else {
+      toast.success("All files uploaded successfully!");
+    }
+
       setFiles([]);
-      window.location.reload();
+      // window.location.reload();
     } catch (err) {
       toast.error(err?.error || "Upload failed");
     }
