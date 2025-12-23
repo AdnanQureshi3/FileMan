@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { MdCloudUpload, MdInfoOutline, MdDeleteForever } from "react-icons/md";
 import {  uploadFiles } from "../Hooks/usePresignedurls.js";
+import axios from "axios";
 
 const FileUploader = ({ setActiveTab }) => {
   const navigate = useNavigate();
@@ -126,7 +127,9 @@ const handleUpload = async () => {
         size: r.file.size,
       }));
       if (successful.length > 0) {
-      await axios.post(`${import.meta.env.VITE_API_URL}/api/file/confirm`, { files: successful });
+        console.log("Confirming uploads for files:", successful);
+        const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/file/confirm`, { files: successful },{ withCredentials: true });
+        console.log("Server response after confirming uploads:", res.data);
     }
 
    

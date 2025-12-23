@@ -5,12 +5,14 @@ const limit = pLimit(5);
 const uploadOne = async (file, presigned) => {
   try {
     console.log("Uploading file to S3:", presigned.uploadUrl);
-   const res = await axios(presigned.uploadUrl, {
-        method: "PUT",
-        headers: { "Content-Type": presigned.contentType },
-        data: file,
+   const res = await fetch(presigned.uploadUrl, {
+      method: "PUT",
+      headers: {
+        "Content-Type": presigned.contentType,
+      },
+      body: file,
     });
-// const res = await axios.put(presigned.uploadUrl,file);
+
     console.log("Uploaded file to S3:", res);
     
     return { ...presigned, file, status: "success" };
