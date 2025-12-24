@@ -66,7 +66,7 @@ const getFolder = (mime) => {
 
  const confirmUploads = async (req, res) => {
   console.log("Confirm uploads request received", req.body);
-  const { files } = req.body;
+  const { files , enablePassword, password, enableExpiry, expiryDate } = req.body;
   const userId = Number(req.id);
 
   if (!files || files.length === 0) {
@@ -83,6 +83,8 @@ const getFolder = (mime) => {
         Key: file.key,
       })
     );
+    const shortCode = shortid.generate();
+    const shortUrl = `/f/${shortCode}`;
 
     // 2️⃣ Insert DB record
     await prisma.file.create({
@@ -92,7 +94,13 @@ const getFolder = (mime) => {
         type: file.type,
         size: file.size,
         createdById: userId,
+        isPasswordProtected: enablePassword || false,
+        password: enablePassword ? await bcrypt.hash(password, 10) : null,
+        hasExpiry: enableExpiry || false,
+        expiresAt: enableExpiry ? new Date(expiryDate) : new Date(Date.now() + 100 * 24 * 60 * 60 * 1000),
         status: "active",
+        shortUrl: shortUrl,
+
       },
     });
 

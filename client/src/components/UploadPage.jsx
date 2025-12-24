@@ -128,7 +128,14 @@ const handleUpload = async () => {
       }));
       if (successful.length > 0) {
         console.log("Confirming uploads for files:", successful);
-        const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/file/confirm`, { files: successful },{ withCredentials: true });
+        const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/file/confirm`, {
+           files: successful , 
+           enablePassword,
+           password: enablePassword ? password : null,
+           enableExpiry,
+           expiryDate: enableExpiry ? expiryDate : null
+          
+          },{ withCredentials: true });
         console.log("Server response after confirming uploads:", res.data);
     }
 
