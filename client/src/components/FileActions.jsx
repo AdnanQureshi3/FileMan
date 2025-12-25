@@ -40,6 +40,7 @@ export default function FileActions({ file, setPreviewFile, setShareFile }) {
 
   const handleDelete = () => {
     dispatch(deleteFile(file.id));
+    
     setOpen(false);
   };
 

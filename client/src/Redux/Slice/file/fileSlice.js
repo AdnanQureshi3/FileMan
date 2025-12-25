@@ -71,7 +71,8 @@ const fileSlice = createSlice({
       })
 
       .addCase(deleteFile.fulfilled, (state, action) => {
-        state.files = state.files.filter((f) => f._id !== action.payload);
+        state.files = state.files.filter((f) => f.id !== action.payload);
+        console.log("Files after deletion:", state.files);
       })
       .addCase(deleteFile.rejected, (state, action) => {
         state.loading = false;

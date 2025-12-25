@@ -6,12 +6,14 @@ import { useNavigate } from "react-router-dom";
 import { MdCloudUpload, MdInfoOutline, MdDeleteForever } from "react-icons/md";
 import {  uploadFiles } from "../Hooks/usePresignedurls.js";
 import axios from "axios";
+import {useLockPage  } from "../Hooks/useBlocker.jsx";
 
 const FileUploader = ({ setActiveTab }) => {
+
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
   const dispatch = useDispatch();
-  const loading = false;
+  const [loading, setLoading] = useState(false);
   const { user } = useSelector((state) => state.auth);
 
   const [files, setFiles] = useState([]);
@@ -23,6 +25,9 @@ const FileUploader = ({ setActiveTab }) => {
   const limit = user?.filesizeLimit || 10;
   const memoryLeft = user?.memoryLeft || 25;
   let countFileGreaterThanLimit = 0;
+
+  useLockPage(loading);
+
 
   const handleBrowseClick = () => {
     fileInputRef.current.click();
@@ -91,6 +96,7 @@ const FileUploader = ({ setActiveTab }) => {
   const totalSize = files.reduce((acc, file) => acc + file.size, 0);
 
 const handleUpload = async () => {
+
   console.log("Starting upload for files:", files);
     if (files.length === 0) {
       toast.error("Please upload at least one file.");
@@ -115,6 +121,7 @@ const handleUpload = async () => {
     }
 
     try {
+      setLoading(true);
       const results = await uploadFiles(files);
 
 
@@ -150,11 +157,22 @@ const handleUpload = async () => {
       toast.success("All files uploaded successfully!");
     }
 
-      setFiles([]);
+      
       // window.location.reload();
     } catch (err) {
       toast.error(err?.error || "Upload failed");
     }
+    finally {
+      setFiles([]);
+      setLoading(false);
+      setEnablePassword(false);
+      setPassword("");
+      setEnableExpiry(false);
+      setExpiryDate("");
+      setDisable(false);
+      
+    }
+
   };
 
   return (

@@ -1,32 +1,53 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 const PreviewModal = ({ file, onClose }) => {
+  const [previewUrl, setPreviewUrl] = useState("");
+
+  useEffect(() => {
+    if (!file) return;
+
+    const url = file instanceof File ? URL.createObjectURL(file) : file.url;
+    setPreviewUrl(url);
+
+    return () => {
+      if (file instanceof File) URL.revokeObjectURL(url);
+    };
+  }, [file]);
+
   if (!file) return null;
 
-  const previewUrl =
-    file instanceof File ? URL.createObjectURL(file) : file.url;
-
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="relative bg-white rounded-2xl shadow-xl w-[90%] max-w-3xl h-[80%] flex flex-col">
-        <button
-          onClick={onClose}
-          className="absolute top-3 right-3 text-white bg-red-500 hover:bg-red-600 rounded-full px-3 py-1"
-        >
-          ✕
-        </button>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="relative bg-gray-900 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+        
+        {/* Header with Filename */}
+        <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+          <span className="text-sm font-medium truncate pr-8">{file.name}</span>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-red-500 transition-colors text-xl font-bold"
+          >
+            ✕
+          </button>
+        </div>
 
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 bg-black flex items-center justify-center overflow-hidden">
           {file.type === "application/pdf" ? (
-            <iframe src={previewUrl} className="w-full h-full border-0" />
+            <iframe src={previewUrl} className="w-full h-[75vh] border-0" />
           ) : file.type?.startsWith("image/") ? (
-            <img src={previewUrl} className="w-full h-full object-contain" />
+            <img src={previewUrl} alt="Preview" className="max-w-full max-h-[75vh] object-contain" />
           ) : file.type?.startsWith("video/") ? (
-            <video src={previewUrl} controls className="w-full h-full" />
+            <video 
+              src={previewUrl} 
+              controls 
+              autoPlay
+              controlsList="nodownload" // Disables the triple-dot download button
+              className="w-full max-h-[75vh] bg-black"
+            >
+              Your browser does not support the video tag.
+            </video>
           ) : (
-            <div className="flex items-center justify-center h-full text-gray-700">
-              Unsupported file
-            </div>
+            <div className="text-white p-20"></div>
           )}
         </div>
       </div>
