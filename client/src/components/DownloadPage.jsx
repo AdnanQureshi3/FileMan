@@ -165,13 +165,18 @@ const DownloadPage = () => {
                   <img src={file.path} alt={file.name} className="w-full rounded-lg shadow" />
                 )}
                 {file.type.startsWith("video/") && (
-                  <video
-                    controls
-                    className="w-full rounded-lg shadow max-h-[300px] sm:max-h-[400px]"
-                  >
-                    <source src={file.path} type={file.type} />
-                  </video>
+                  <div className="relative">
+                    <video
+                      controls
+                      className="w-full rounded-lg shadow max-h-[300px] sm:max-h-[400px]"
+                    >
+                      <source src={file.path} type={file.type} />
+                    </video>
+
+                    
+                  </div>
                 )}
+
                 {file.type.startsWith("audio/") && (
                   <audio controls className="w-full">
                     <source src={file.path} type={file.type} />
@@ -179,14 +184,7 @@ const DownloadPage = () => {
                 )}
                 {file.type === "application/pdf" && (
                   <div className="relative">
-                    <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center rounded-lg">
-                      <button
-                        onClick={() => window.open(file.path, "_blank")}
-                        className="bg-blue-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium hover:bg-blue-700 text-sm sm:text-base"
-                      >
-                        📄 Open PDF in Browser
-                      </button>
-                    </div>
+                   
                     <iframe
                       src={file.path}
                       title="PDF"
@@ -244,13 +242,24 @@ const DownloadPage = () => {
           )}
 
           {(!isProtected || isVerified) && (
+            <div className=" mt-5 flex flex-col gap-4">
+
             <button
               onClick={handleDownload}
               className="w-full bg-green-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-green-700 font-medium text-sm sm:text-base"
-            >
+              >
               ⬇️ Download File
             </button>
+                      <button
+                        onClick={() => window.open(file.path, "_blank")}
+                        className="pointer-events-auto bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700"
+                      >
+                        ▶️ Open {file.type} in New Tab
+                      </button>
+            
+              </div>
           )}
+          
         </div>
       </div>
     </div>
