@@ -12,6 +12,7 @@ const FileTable = ({
   setPreviewFile,
   setShareFile
 }) => {
+  
   const totalPages = Math.ceil((files?.length || 0) / itemsPerPage);
   const paginatedFiles = files?.slice(
     (currentPage - 1) * itemsPerPage,

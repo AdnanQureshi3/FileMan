@@ -14,6 +14,7 @@ app.use(cors({
 
     credentials:true
 }));
+
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -21,5 +22,4 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
 //where dev is formate from 3 formates(dev , tiny , combined) 
-
 export default app;
