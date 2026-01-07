@@ -19,13 +19,8 @@ app.use('/api/file' , FileRouter);
 app.use("/api/razorpay", razorpayRoutes);
 app.use("/api/new", newRouter);
 
-app.use(express.static(path.join(__dirname, '/client/dist')));
-app.get(/^\/(?!api).*/, (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'));
-});
+
 
 app.listen(PORT, () => {
-
-   
     console.log(`Server is running on port ${PORT}`);
 });
