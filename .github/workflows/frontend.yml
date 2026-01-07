@@ -1,0 +1,21 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "client/**"
+
+jobs:
+  frontend:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t frontend ./client
+      - run: |
+          docker stop frontend || true
+          docker rm frontend || true
+          docker run -d \
+            --name frontend \
+            -p 80:80 \
+            frontend

@@ -1,0 +1,23 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "ServerSide/**"
+      - "prisma/**"
+
+jobs:
+  backend:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t backend ./ServerSide
+      - run: |
+          docker stop backend || true
+          docker rm backend || true
+          docker run -d \
+            --name backend \
+            --env-file /home/ubuntu/backend.env \
+            -p 3000:3000 \
+            backend
