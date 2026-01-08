@@ -1,6 +1,5 @@
 import React, { useState } from "react"
 import axios from "axios"
-import { set } from "mongoose"
 
 function FeedbackBox() {
   const [feedback, setFeedback] = useState("")
