@@ -3,6 +3,8 @@ name: Build and Deploy
 on:
   push:
     branches: [ main ]
+    paths:
+      - "ServerSide/**"   # Only run workflow when ServerSide files change
 
 jobs:
   build:
@@ -29,4 +31,3 @@ jobs:
           cd /home/ubuntu/app
           docker pull ${{ secrets.DOCKER_USERNAME }}/backend:latest
           docker compose up -d
-

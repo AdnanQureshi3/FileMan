@@ -20,7 +20,7 @@ function Signup() {
   async function signupHandler(e) {
     e.preventDefault(); // prevent page reload
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/user/register`, input, {
+      const res = await axios.post(`/api/user/register`, input, {
         headers: { "Content-Type": "application/json" }
       });
       if (res.data.success) {
