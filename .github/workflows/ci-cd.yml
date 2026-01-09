@@ -17,10 +17,8 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - run: docker build -t ${{ secrets.DOCKER_USERNAME }}/backend:latest ./ServerSide
-      - run: docker build -t ${{ secrets.DOCKER_USERNAME }}/frontend:latest ./client
 
       - run: docker push ${{ secrets.DOCKER_USERNAME }}/backend:latest
-      - run: docker push ${{ secrets.DOCKER_USERNAME }}/frontend:latest
 
   deploy:
     needs: build
@@ -30,6 +28,5 @@ jobs:
       - run: |
           cd /home/ubuntu/app
           docker pull ${{ secrets.DOCKER_USERNAME }}/backend:latest
-          docker pull ${{ secrets.DOCKER_USERNAME }}/frontend:latest
           docker compose up -d
 
