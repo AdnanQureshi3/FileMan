@@ -117,7 +117,7 @@ if (!result.success) {
             });
         }
         const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-        if(user.isPremium == true && user.premiumExpiry < Date.now()){
+        if(!user.premiumExpiry || user.premiumExpiry < Date.now()){
            user = await prisma.user.update({
                 where: { id: user.id },
                 data: {
@@ -125,6 +125,8 @@ if (!result.success) {
                     filesizeLimit: 10,
                     TotalSizeLimit: 25,
                     premiumExpiry: null,
+                    plan:'Free',
+                    UsedStorage:12
                 }
             });
         }
